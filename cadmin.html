@@ -1,0 +1,3125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>CEZOO Orders Dashboard</title>
+
+  <!-- Bungee font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  >
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    :root{
+      --green:#0bd957;
+      --green-dark:#079a40;
+      --green-soft:#eafff1;
+
+      --pink:#ff0f64;
+      --orange:#ff9f0a;
+      --blue:#1677ff;
+      --purple:#7c3aed;
+      --red:#ef4444;
+
+      --text:#17191f;
+      --muted:#747984;
+      --line:#e9ebef;
+      --page:#f6f7f9;
+      --white:#ffffff;
+
+      --shadow:
+        0 8px 28px rgba(20, 25, 35, .07);
+    }
+
+    body{
+      min-height:100vh;
+      background:var(--page);
+      color:var(--text);
+      font-family:"Inter", Arial, sans-serif;
+    }
+
+    button,
+    input,
+    select{
+      font:inherit;
+    }
+
+    button{
+      cursor:pointer;
+    }
+
+    /* =========================
+       TOP NAV
+    ========================= */
+
+    .topNav{
+      position:sticky;
+      top:0;
+      z-index:1000;
+
+      width:100%;
+      height:74px;
+
+      display:flex;
+      align-items:center;
+
+      padding:0 24px;
+
+      background:#fff;
+      border-bottom:1px solid var(--line);
+    }
+
+    .cezooLogo{
+      font-family:"Bungee", sans-serif;
+      font-size:28px;
+      line-height:1;
+      color:var(--green);
+      letter-spacing:.4px;
+    }
+
+    /* Right side intentionally empty */
+    .topNavRight{
+      margin-left:auto;
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    .dashboardMain{
+      width:min(1480px, calc(100% - 32px));
+      margin:0 auto;
+      padding:28px 0 50px;
+    }
+
+    .dashboardHeadingRow{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:22px;
+    }
+
+    .dashboardHeading h1{
+      font-size:26px;
+      font-weight:800;
+      letter-spacing:-.5px;
+      margin-bottom:6px;
+    }
+
+    .dashboardHeading p{
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .refreshBtn{
+      height:42px;
+      padding:0 17px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+
+      border:1px solid var(--line);
+      border-radius:12px;
+
+      background:#fff;
+      color:#262932;
+
+      font-size:13px;
+      font-weight:700;
+
+      box-shadow:0 3px 12px rgba(0,0,0,.04);
+    }
+
+    .refreshBtn:hover{
+      background:#fafafa;
+    }
+
+    .refreshBtn.loading i{
+      animation:refreshSpin .8s linear infinite;
+    }
+
+    @keyframes refreshSpin{
+      to{
+        transform:rotate(360deg);
+      }
+    }
+
+    /* =========================
+       SUMMARY CARDS
+    ========================= */
+
+    .summaryGrid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:14px;
+      margin-bottom:20px;
+    }
+
+    .summaryCard{
+      min-height:120px;
+      padding:18px;
+
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .summaryLabel{
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
+
+    .summaryValue{
+      font-size:27px;
+      font-weight:800;
+      letter-spacing:-.6px;
+    }
+
+    .summarySub{
+      margin-top:7px;
+      font-size:11px;
+      color:#9196a0;
+    }
+
+    .summaryIcon{
+      width:44px;
+      height:44px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      border-radius:14px;
+      font-size:17px;
+      flex-shrink:0;
+    }
+
+    .summaryIcon.orders{
+      background:var(--green-soft);
+      color:var(--green-dark);
+    }
+
+    .summaryIcon.cash{
+      background:#fff5df;
+      color:#df8500;
+    }
+
+    .summaryIcon.upi{
+      background:#eef4ff;
+      color:var(--blue);
+    }
+
+    .summaryIcon.revenue{
+      background:#f2edff;
+      color:var(--purple);
+    }
+
+    /* =========================
+       CONTROL AREA
+    ========================= */
+
+    .controlCard{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      margin-bottom:18px;
+    }
+
+    .orderTabs{
+      display:flex;
+      align-items:center;
+      gap:8px;
+
+      padding:14px;
+      border-bottom:1px solid var(--line);
+      overflow-x:auto;
+    }
+
+    .orderTab{
+      min-width:max-content;
+      height:40px;
+      padding:0 17px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+
+      border:1px solid transparent;
+      border-radius:12px;
+
+      background:#f5f6f8;
+      color:#656a75;
+
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .orderTab.active{
+      background:#111318;
+      color:#fff;
+    }
+
+    .tabCount{
+      min-width:21px;
+      height:21px;
+      padding:0 6px;
+
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+
+      border-radius:20px;
+      background:rgba(255,255,255,.18);
+      font-size:10px;
+    }
+
+    .orderTab:not(.active) .tabCount{
+      background:#e4e6eb;
+      color:#606570;
+    }
+
+    .filtersRow{
+      display:grid;
+      grid-template-columns:minmax(220px, 1fr) 190px 190px;
+      gap:12px;
+      padding:14px;
+    }
+
+    .searchBox{
+      height:44px;
+      position:relative;
+    }
+
+    .searchBox i{
+      position:absolute;
+      left:14px;
+      top:50%;
+      transform:translateY(-50%);
+      color:#969ba5;
+      font-size:14px;
+    }
+
+    .searchBox input{
+      width:100%;
+      height:100%;
+
+      border:1px solid var(--line);
+      border-radius:12px;
+      outline:none;
+
+      padding:0 14px 0 40px;
+      background:#fafbfc;
+
+      font-size:13px;
+      color:#22252c;
+    }
+
+    .searchBox input:focus{
+      border-color:#b9bec8;
+      background:#fff;
+    }
+
+    .filterSelect{
+      width:100%;
+      height:44px;
+
+      border:1px solid var(--line);
+      border-radius:12px;
+      outline:none;
+
+      background:#fafbfc;
+      padding:0 13px;
+
+      color:#373b45;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    /* =========================
+       ORDERS TABLE
+    ========================= */
+
+    .ordersCard{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .ordersCardHeader{
+      min-height:62px;
+      padding:14px 18px;
+
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+
+      border-bottom:1px solid var(--line);
+    }
+
+    .ordersCardHeader h2{
+      font-size:16px;
+      font-weight:800;
+    }
+
+    .ordersResultText{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .ordersTableWrap{
+      width:100%;
+      overflow-x:auto;
+    }
+
+    .ordersTable{
+      width:100%;
+      min-width:1120px;
+      border-collapse:collapse;
+    }
+
+    .ordersTable th{
+      padding:13px 15px;
+      text-align:left;
+
+      background:#fafbfc;
+      border-bottom:1px solid var(--line);
+
+      color:#777d88;
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+    }
+
+    .ordersTable td{
+      padding:15px;
+      border-bottom:1px solid #f0f1f3;
+      vertical-align:middle;
+      font-size:12px;
+    }
+
+    .ordersTable tbody tr{
+      transition:.15s ease;
+    }
+
+    .ordersTable tbody tr:hover{
+      background:#fcfcfd;
+    }
+
+    .orderIdText{
+      max-width:190px;
+      font-size:11px;
+      font-weight:800;
+      color:#353943;
+      word-break:break-word;
+    }
+
+    .customerName{
+      font-size:13px;
+      font-weight:750;
+      color:#21242b;
+      margin-bottom:4px;
+    }
+
+    .customerMobile{
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    .addressText{
+      max-width:230px;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+
+      line-height:1.45;
+      color:#606570;
+      font-size:11px;
+    }
+
+    .amountText{
+      font-size:14px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .smallText{
+      font-size:10px;
+      color:#8a909a;
+      margin-top:4px;
+    }
+
+    .badge{
+      width:max-content;
+      min-height:27px;
+      padding:6px 9px;
+
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:5px;
+
+      border-radius:20px;
+      font-size:10px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .badge.instant{
+      background:#fff1e7;
+      color:#d66300;
+    }
+
+    .badge.day{
+      background:var(--green-soft);
+      color:#088b3a;
+    }
+
+    .badge.cash{
+      background:#fff4dc;
+      color:#be7400;
+    }
+
+    .badge.upi{
+      background:#ebf3ff;
+      color:#1466c9;
+    }
+
+    .badge.pending{
+      background:#fff4dd;
+      color:#ba7300;
+    }
+
+    .badge.paid{
+      background:#eafff0;
+      color:#07833a;
+    }
+
+    .badge.placed{
+      background:#eef4ff;
+      color:#1769c8;
+    }
+
+    .badge.packed{
+      background:#f4edff;
+      color:#7238c9;
+    }
+
+    .badge.on_the_way{
+      background:#fff0e8;
+      color:#d85c00;
+    }
+
+    .badge.delivered{
+      background:#e8fff0;
+      color:#087d39;
+    }
+
+    .badge.cancelled,
+    .badge.canceled{
+      background:#ffeaea;
+      color:#d93636;
+    }
+
+    .viewBtn{
+      width:36px;
+      height:36px;
+
+      border:1px solid var(--line);
+      border-radius:10px;
+
+      background:#fff;
+      color:#292c34;
+    }
+
+    .viewBtn:hover{
+      background:#111318;
+      color:#fff;
+    }
+
+    /* =========================
+       LOADING / EMPTY
+    ========================= */
+
+    .dashboardState{
+      min-height:320px;
+      padding:45px 20px;
+
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+
+      text-align:center;
+    }
+
+    .stateSpinner{
+      width:38px;
+      height:38px;
+      border:3px solid #eceef2;
+      border-top-color:var(--green);
+      border-radius:50%;
+      animation:stateSpin .7s linear infinite;
+      margin-bottom:16px;
+    }
+
+    @keyframes stateSpin{
+      to{
+        transform:rotate(360deg);
+      }
+    }
+
+    .dashboardState i{
+      font-size:34px;
+      color:#b3b7c0;
+      margin-bottom:13px;
+    }
+
+    .dashboardState h3{
+      font-size:15px;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+
+    .dashboardState p{
+      font-size:12px;
+      color:var(--muted);
+      max-width:320px;
+      line-height:1.5;
+    }
+
+    /* =========================
+       DETAILS MODAL
+    ========================= */
+
+    .detailsOverlay{
+      position:fixed;
+      inset:0;
+      z-index:5000;
+
+      display:flex;
+      justify-content:flex-end;
+
+      background:rgba(16,18,24,.45);
+
+      opacity:0;
+      visibility:hidden;
+      transition:.22s ease;
+    }
+
+    .detailsOverlay.open{
+      opacity:1;
+      visibility:visible;
+    }
+
+    .detailsPanel{
+      width:min(520px, 100%);
+      height:100%;
+
+      display:flex;
+      flex-direction:column;
+
+      background:#fff;
+      transform:translateX(100%);
+      transition:.28s cubic-bezier(.22,.8,.32,1);
+    }
+
+    .detailsOverlay.open .detailsPanel{
+      transform:translateX(0);
+    }
+
+    .detailsHeader{
+      min-height:72px;
+      padding:15px 18px;
+
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+
+      border-bottom:1px solid var(--line);
+    }
+
+    .detailsHeader h2{
+      font-size:17px;
+      font-weight:800;
+    }
+
+    .detailsHeader p{
+      margin-top:4px;
+      font-size:10px;
+      color:var(--muted);
+      word-break:break-all;
+    }
+
+    .detailsClose{
+      width:36px;
+      height:36px;
+      border:none;
+      border-radius:50%;
+      background:#f1f2f4;
+      color:#222;
+      font-size:20px;
+    }
+
+    .detailsBody{
+      flex:1;
+      overflow-y:auto;
+      padding:17px;
+      background:#f7f8fa;
+    }
+
+    .detailCard{
+      padding:16px;
+      margin-bottom:13px;
+
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+    }
+
+    .detailCardTitle{
+      margin-bottom:13px;
+
+      display:flex;
+      align-items:center;
+      gap:8px;
+
+      font-size:13px;
+      font-weight:800;
+    }
+
+    .detailCardTitle i{
+      color:var(--green-dark);
+    }
+
+    .detailRows{
+      display:flex;
+      flex-direction:column;
+      gap:11px;
+    }
+
+    .detailRow{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .detailRow span:first-child{
+      color:#7c818c;
+      flex-shrink:0;
+    }
+
+    .detailRow strong{
+      text-align:right;
+      color:#282b33;
+      font-weight:700;
+      word-break:break-word;
+    }
+
+    .productOrderItem{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+
+      padding:11px 0;
+      border-bottom:1px dashed #e3e5e9;
+    }
+
+    .productOrderItem:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
+
+    .productTableName{
+      font-size:11px;
+      color:#7b808a;
+      margin-top:4px;
+      word-break:break-word;
+    }
+
+    .productId{
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .productQty{
+      min-width:35px;
+      height:29px;
+      padding:0 9px;
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      border-radius:9px;
+      background:#111318;
+      color:#fff;
+
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .instructionTags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+    }
+
+    .instructionTag{
+      padding:7px 9px;
+      border-radius:9px;
+      background:#f3f4f6;
+      color:#4f535c;
+      font-size:10px;
+      font-weight:700;
+    }
+
+    .statusUpdateBox{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:9px;
+    }
+
+    .statusUpdateBox select{
+      height:43px;
+      border:1px solid var(--line);
+      border-radius:11px;
+      padding:0 11px;
+      outline:none;
+      background:#fafafa;
+      font-size:12px;
+      font-weight:650;
+    }
+
+    .updateStatusBtn{
+      height:43px;
+      padding:0 15px;
+
+      border:none;
+      border-radius:11px;
+
+      background:#111318;
+      color:#fff;
+
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .updateStatusBtn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    /* =========================
+       TOAST
+    ========================= */
+
+    .dashboardToast{
+      position:fixed;
+      left:50%;
+      bottom:24px;
+      z-index:8000;
+
+      max-width:calc(100% - 30px);
+      padding:12px 17px;
+
+      border-radius:12px;
+      background:#181a20;
+      color:#fff;
+
+      font-size:12px;
+      font-weight:700;
+
+      opacity:0;
+      visibility:hidden;
+      transform:translate(-50%, 20px);
+
+      transition:.22s ease;
+      box-shadow:0 10px 35px rgba(0,0,0,.22);
+    }
+
+    .dashboardToast.show{
+      opacity:1;
+      visibility:visible;
+      transform:translate(-50%, 0);
+    }
+
+    .dashboardToast.error{
+      background:#d93434;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media(max-width:1000px){
+      .summaryGrid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+
+      .filtersRow{
+        grid-template-columns:1fr 1fr;
+      }
+
+      .searchBox{
+        grid-column:1 / -1;
+      }
+    }
+
+    @media(max-width:600px){
+      .topNav{
+        height:66px;
+        padding:0 16px;
+      }
+
+      .cezooLogo{
+        font-size:24px;
+      }
+
+      .dashboardMain{
+        width:calc(100% - 20px);
+        padding-top:18px;
+      }
+
+      .dashboardHeadingRow{
+        align-items:center;
+      }
+
+      .dashboardHeading h1{
+        font-size:21px;
+      }
+
+      .dashboardHeading p{
+        display:none;
+      }
+
+      .refreshBtn{
+        width:42px;
+        padding:0;
+      }
+
+      .refreshBtn span{
+        display:none;
+      }
+
+      .summaryGrid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:9px;
+      }
+
+      .summaryCard{
+        min-height:110px;
+        padding:14px;
+        border-radius:15px;
+      }
+
+      .summaryValue{
+        font-size:22px;
+      }
+
+      .summaryIcon{
+        width:37px;
+        height:37px;
+        font-size:14px;
+      }
+
+      .summarySub{
+        font-size:9px;
+      }
+
+      .filtersRow{
+        grid-template-columns:1fr;
+        gap:9px;
+      }
+
+      .searchBox{
+        grid-column:auto;
+      }
+
+      .ordersCardHeader{
+        padding:13px 14px;
+      }
+
+      .detailsPanel{
+        width:100%;
+      }
+
+      .detailsHeader{
+        min-height:66px;
+      }
+
+      .detailsBody{
+        padding:12px;
+      }
+    }
+    /* =========================
+   ORDERED PRODUCTS
+========================= */
+
+.viewProductsBtn{
+  min-width:112px;
+  height:34px;
+  padding:0 11px;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+
+  border:1px solid #dfe2e7;
+  border-radius:10px;
+
+  background:#fff;
+  color:#252830;
+
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.viewProductsBtn:hover{
+  background:#111318;
+  color:#fff;
+  border-color:#111318;
+}
+
+.orderProductsLoading{
+  min-height:180px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+}
+
+.orderProductsLoading .stateSpinner{
+  width:31px;
+  height:31px;
+  margin-bottom:12px;
+}
+
+.orderProductsLoading p{
+  color:#777d88;
+  font-size:11px;
+}
+
+.orderedProductCard{
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr) auto;
+  gap:12px;
+
+  align-items:center;
+
+  padding:12px;
+  margin-bottom:10px;
+
+  border:1px solid #e8eaee;
+  border-radius:14px;
+  background:#fff;
+}
+
+.orderedProductCard:last-child{
+  margin-bottom:0;
+}
+
+.orderedProductImage{
+  width:64px;
+  height:64px;
+
+  border-radius:12px;
+  overflow:hidden;
+
+  background:#f5f6f8;
+  border:1px solid #eceef1;
+}
+
+.orderedProductImage img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:contain;
+}
+
+.orderedProductInfo{
+  min-width:0;
+}
+
+.orderedProductName{
+  margin-bottom:4px;
+
+  color:#20232a;
+  font-size:12px;
+  font-weight:800;
+
+  line-height:1.35;
+
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+.orderedProductTelugu{
+  margin-bottom:5px;
+  color:#6f7580;
+  font-size:10px;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.orderedProductPack{
+  color:#8a9099;
+  font-size:10px;
+}
+
+.orderedProductMeta{
+  min-width:75px;
+  text-align:right;
+}
+
+.orderedProductQty{
+  width:max-content;
+  min-width:37px;
+  height:28px;
+  padding:0 8px;
+
+  margin-left:auto;
+  margin-bottom:6px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:9px;
+  background:#111318;
+  color:#fff;
+
+  font-size:10px;
+  font-weight:800;
+}
+
+.orderedProductPrice{
+  color:#252830;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.orderedProductSinglePrice{
+  margin-top:3px;
+  color:#9297a0;
+  font-size:9px;
+  white-space:nowrap;
+}
+
+.productMissingCard{
+  padding:13px;
+  margin-bottom:9px;
+
+  border:1px dashed #d8dbe1;
+  border-radius:12px;
+
+  background:#fafafa;
+}
+
+.productMissingCard strong{
+  display:block;
+  margin-bottom:4px;
+
+  color:#383c45;
+  font-size:11px;
+}
+
+.productMissingCard span{
+  color:#838892;
+  font-size:10px;
+}
+.viewMapBtn{
+  width:100%;
+  height:43px;
+  margin-top:14px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  border:none;
+  border-radius:12px;
+
+  background:#0bd957;
+  color:#fff;
+
+  font-size:12px;
+  font-weight:800;
+
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.viewMapBtn:hover{
+  background:#09bd4c;
+}
+
+.viewMapBtn i{
+  font-size:14px;
+}
+
+.viewMapBtn.disabled{
+  pointer-events:none;
+  opacity:.5;
+  background:#aeb3bb;
+}
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       TOP NAVIGATION
+  ========================== -->
+
+  <header class="topNav">
+    <div class="cezooLogo">CEZOO</div>
+    <div class="topNavRight"></div>
+  </header>
+
+
+  <!-- =========================
+       DASHBOARD
+  ========================== -->
+
+  <main class="dashboardMain">
+
+    <div class="dashboardHeadingRow">
+
+      <div class="dashboardHeading">
+        <h1>Orders Dashboard</h1>
+        <p>View and manage Cash Delivery and UPI orders.</p>
+      </div>
+
+      <button
+        id="refreshOrdersBtn"
+        class="refreshBtn"
+        type="button"
+      >
+        <i class="fa-solid fa-rotate-right"></i>
+        <span>Refresh</span>
+      </button>
+
+    </div>
+
+
+    <!-- SUMMARY -->
+
+    <section class="summaryGrid">
+
+      <div class="summaryCard">
+        <div>
+          <div class="summaryLabel">Total Orders</div>
+          <div id="totalOrdersCount" class="summaryValue">0</div>
+          <div class="summarySub">Cash and UPI combined</div>
+        </div>
+
+        <div class="summaryIcon orders">
+          <i class="fa-solid fa-box"></i>
+        </div>
+      </div>
+
+
+      <div class="summaryCard">
+        <div>
+          <div class="summaryLabel">Cash Orders</div>
+          <div id="cashOrdersCount" class="summaryValue">0</div>
+          <div class="summarySub">Cash at delivery</div>
+        </div>
+
+        <div class="summaryIcon cash">
+          <i class="fa-solid fa-money-bill-wave"></i>
+        </div>
+      </div>
+
+
+      <div class="summaryCard">
+        <div>
+          <div class="summaryLabel">UPI Orders</div>
+          <div id="upiOrdersCount" class="summaryValue">0</div>
+          <div class="summarySub">Online paid orders</div>
+        </div>
+
+        <div class="summaryIcon upi">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+      </div>
+
+
+      <div class="summaryCard">
+        <div>
+          <div class="summaryLabel">Total Revenue</div>
+          <div id="totalRevenueAmount" class="summaryValue">₹0</div>
+          <div class="summarySub">Value of all orders</div>
+        </div>
+
+        <div class="summaryIcon revenue">
+          <i class="fa-solid fa-indian-rupee-sign"></i>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- CONTROLS -->
+
+    <section class="controlCard">
+
+      <div class="orderTabs">
+
+        <button
+          class="orderTab active"
+          data-type="all"
+          type="button"
+        >
+          All Orders
+          <span id="allTabCount" class="tabCount">0</span>
+        </button>
+
+        <button
+          class="orderTab"
+          data-type="cash"
+          type="button"
+        >
+          Cash Delivery
+          <span id="cashTabCount" class="tabCount">0</span>
+        </button>
+
+        <button
+          class="orderTab"
+          data-type="upi"
+          type="button"
+        >
+          UPI
+          <span id="upiTabCount" class="tabCount">0</span>
+        </button>
+
+      </div>
+
+
+      <div class="filtersRow">
+
+        <div class="searchBox">
+          <i class="fa-solid fa-magnifying-glass"></i>
+
+          <input
+            id="orderSearchInput"
+            type="search"
+            placeholder="Search order ID, customer, mobile or address"
+          >
+        </div>
+
+
+        <select id="statusFilter" class="filterSelect">
+          <option value="all">All Statuses</option>
+          <option value="placed">Placed</option>
+          <option value="packed">Packed</option>
+          <option value="on_the_way">On the Way</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+
+
+        <select id="deliveryModeFilter" class="filterSelect">
+          <option value="all">All Delivery Modes</option>
+          <option value="instant">Instant Delivery</option>
+          <option value="12_hours">Day Delivery</option>
+        </select>
+
+      </div>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section class="ordersCard">
+
+      <div class="ordersCardHeader">
+
+        <h2>Customer Orders</h2>
+
+        <div
+          id="ordersResultText"
+          class="ordersResultText"
+        >
+          Showing 0 orders
+        </div>
+
+      </div>
+
+
+      <div id="ordersDisplay">
+
+        <div class="dashboardState">
+          <div class="stateSpinner"></div>
+          <h3>Loading orders</h3>
+          <p>Please wait while the latest orders are fetched.</p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       ORDER DETAILS
+  ========================== -->
+
+  <div id="detailsOverlay" class="detailsOverlay">
+
+    <aside class="detailsPanel">
+
+      <div class="detailsHeader">
+
+        <div>
+          <h2>Order Details</h2>
+          <p id="detailsOrderId">—</p>
+        </div>
+
+        <button
+          id="detailsCloseBtn"
+          class="detailsClose"
+          type="button"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div id="detailsBody" class="detailsBody"></div>
+
+    </aside>
+
+  </div>
+
+
+  <div id="dashboardToast" class="dashboardToast"></div>
+
+
+  <script>
+    /* =====================================================
+       SUPABASE CONNECTION
+    ===================================================== */
+
+    const SUPABASE_URL =
+      "https://mglyaebackjtwbimvokm.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_qMli5WhM2pMnT6_oUsFe4Q_Fzq_-YuB";
+
+
+    const dashboardSupabase =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+
+    /* =====================================================
+       STATE
+    ===================================================== */
+
+    let cashOrders = [];
+    let upiOrders = [];
+    let allOrders = [];
+
+    let selectedOrderType = "all";
+    let currentOpenedOrder = null;
+
+const dashboardProductCache = {};
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const ordersDisplay =
+      document.getElementById("ordersDisplay");
+
+    const searchInput =
+      document.getElementById("orderSearchInput");
+
+    const statusFilter =
+      document.getElementById("statusFilter");
+
+    const deliveryModeFilter =
+      document.getElementById("deliveryModeFilter");
+
+    const refreshBtn =
+      document.getElementById("refreshOrdersBtn");
+
+    const detailsOverlay =
+      document.getElementById("detailsOverlay");
+
+    const detailsBody =
+      document.getElementById("detailsBody");
+
+    const detailsOrderId =
+      document.getElementById("detailsOrderId");
+
+
+    /* =====================================================
+       HELPERS
+    ===================================================== */
+
+    function safeNumber(value){
+      const number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+
+    function escapeHtml(value){
+
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    }
+
+
+    function formatMoney(value){
+
+      return new Intl.NumberFormat(
+        "en-IN",
+        {
+          style:"currency",
+          currency:"INR",
+          maximumFractionDigits:2
+        }
+      ).format(safeNumber(value));
+
+    }
+
+
+    function formatDate(dateValue){
+
+      if(!dateValue){
+        return "—";
+      }
+
+      const date = new Date(dateValue);
+
+      if(Number.isNaN(date.getTime())){
+        return dateValue;
+      }
+
+      return date.toLocaleString(
+        "en-IN",
+        {
+          day:"2-digit",
+          month:"short",
+          year:"numeric",
+          hour:"2-digit",
+          minute:"2-digit",
+          hour12:true
+        }
+      );
+
+    }
+
+
+    function getStatusLabel(status){
+
+      const labels = {
+        placed:"Placed",
+        packed:"Packed",
+        on_the_way:"On the Way",
+        delivered:"Delivered",
+        cancelled:"Cancelled",
+        canceled:"Cancelled"
+      };
+
+      return labels[status] || status || "Placed";
+
+    }
+
+
+    function getDeliveryModeLabel(mode){
+
+      return mode === "12_hours"
+        ? "Day Delivery"
+        : "Instant";
+
+    }
+
+
+    function getPaymentLabel(order){
+
+      return order._order_type === "upi"
+        ? "UPI"
+        : "Cash Delivery";
+
+    }
+
+
+    function showToast(message, isError = false){
+
+      const toast =
+        document.getElementById("dashboardToast");
+
+      toast.textContent = message;
+
+      toast.classList.toggle(
+        "error",
+        isError
+      );
+
+      toast.classList.add("show");
+
+      clearTimeout(toast._timer);
+
+      toast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2600);
+
+    }
+
+    /* =====================================================
+   LOAD REAL PRODUCT DETAILS
+===================================================== */
+
+async function loadOrderedProductDetails(items){
+
+  if(!Array.isArray(items) || items.length === 0){
+    return [];
+  }
+
+
+  /*
+    Group IDs based on their Supabase table.
+
+    Example:
+    fresh_products: [15, 20]
+    cezoogroceries: [42, 60]
+  */
+
+  const groupedItems = {};
+
+  items.forEach(item => {
+
+    const tableName =
+      String(item.product_table || "").trim();
+
+    const productId =
+      Number(item.product_id);
+
+
+    if(!tableName || !Number.isFinite(productId)){
+      return;
+    }
+
+
+    if(!groupedItems[tableName]){
+      groupedItems[tableName] = [];
+    }
+
+
+    groupedItems[tableName].push({
+      product_id:productId,
+      qty:safeNumber(item.qty) || 1
+    });
+
+  });
+
+
+  const finalProducts = [];
+
+
+  for(const [
+    tableName,
+    tableItems
+  ] of Object.entries(groupedItems)){
+
+
+    const ids = [
+      ...new Set(
+        tableItems.map(item => item.product_id)
+      )
+    ];
+
+
+    const idsToFetch =
+      ids.filter(id => {
+
+        const cacheKey =
+          `${tableName}_${id}`;
+
+        return !dashboardProductCache[cacheKey];
+
+      });
+
+
+    /*
+      Fetch all required IDs from that table
+      in one Supabase request.
+    */
+
+    if(idsToFetch.length > 0){
+
+      const { data, error } =
+        await dashboardSupabase
+          .from(tableName)
+          .select(`
+            id,
+            name,
+            name_telugu,
+            quantity,
+            unit,
+            original_price,
+            discount_price,
+            image1
+          `)
+          .in("id", idsToFetch);
+
+
+      if(error){
+
+        console.error(
+          `Product fetch failed from ${tableName}:`,
+          error
+        );
+
+      }else{
+
+        (data || []).forEach(product => {
+
+          const cacheKey =
+            `${tableName}_${product.id}`;
+
+          dashboardProductCache[cacheKey] = {
+            ...product,
+            product_table:tableName
+          };
+
+        });
+
+      }
+
+    }
+
+
+    /*
+      Put products back in the same order
+      saved inside the order.
+    */
+
+    tableItems.forEach(savedItem => {
+
+      const cacheKey =
+        `${tableName}_${savedItem.product_id}`;
+
+      const product =
+        dashboardProductCache[cacheKey];
+
+
+      if(product){
+
+        finalProducts.push({
+          ...product,
+          ordered_qty:savedItem.qty
+        });
+
+      }else{
+
+        finalProducts.push({
+          id:savedItem.product_id,
+          product_table:tableName,
+          ordered_qty:savedItem.qty,
+          _missing:true
+        });
+
+      }
+
+    });
+
+  }
+
+
+  return finalProducts;
+
+}
+
+
+/* =====================================================
+   PRODUCTS HTML
+===================================================== */
+
+function renderOrderedProductsHtml(products){
+
+  if(!products.length){
+
+    return `
+      <div class="dashboardState">
+        <i class="fa-regular fa-folder-open"></i>
+        <h3>No products found</h3>
+        <p>This order has no saved product information.</p>
+      </div>
+    `;
+
+  }
+
+
+  return products.map(product => {
+
+    if(product._missing){
+
+      return `
+        <div class="productMissingCard">
+
+          <strong>
+            Product ID:
+            ${escapeHtml(product.id)}
+          </strong>
+
+          <span>
+            Table:
+            ${escapeHtml(product.product_table)}
+            · Quantity:
+            ${safeNumber(product.ordered_qty)}
+          </span>
+
+        </div>
+      `;
+
+    }
+
+
+    const orderedQty =
+      safeNumber(product.ordered_qty) || 1;
+
+
+    const singlePrice =
+      safeNumber(
+        product.discount_price ||
+        product.original_price
+      );
+
+
+    const productTotal =
+      singlePrice * orderedQty;
+
+
+    return `
+      <div class="orderedProductCard">
+
+        <div class="orderedProductImage">
+
+          ${
+            product.image1
+              ? `
+                <img
+                  src="${escapeHtml(product.image1)}"
+                  alt="${escapeHtml(product.name || "Product")}"
+                  loading="lazy"
+                >
+              `
+              : `
+                <div
+                  style="
+                    width:100%;
+                    height:100%;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    color:#a0a5ae;
+                  "
+                >
+                  <i class="fa-solid fa-box"></i>
+                </div>
+              `
+          }
+
+        </div>
+
+
+        <div class="orderedProductInfo">
+
+          <div class="orderedProductName">
+            ${escapeHtml(product.name || `Product ${product.id}`)}
+          </div>
+
+
+          ${
+            product.name_telugu
+              ? `
+                <div class="orderedProductTelugu">
+                  ${escapeHtml(product.name_telugu)}
+                </div>
+              `
+              : ""
+          }
+
+
+          <div class="orderedProductPack">
+
+            ${
+              product.quantity || product.unit
+                ? `
+                  ${escapeHtml(product.quantity || "")}
+                  ${escapeHtml(product.unit || "")}
+                `
+                : "Pack information unavailable"
+            }
+
+          </div>
+
+        </div>
+
+
+        <div class="orderedProductMeta">
+
+          <div class="orderedProductQty">
+            ×${orderedQty}
+          </div>
+
+          <div class="orderedProductPrice">
+            ${formatMoney(productTotal)}
+          </div>
+
+          <div class="orderedProductSinglePrice">
+            ${formatMoney(singlePrice)} each
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+  }).join("");
+
+}
+
+
+/* =====================================================
+   OPEN ONLY ORDERED PRODUCTS
+===================================================== */
+
+window.openOrderedProducts = async function(index){
+
+  const order = allOrders[index];
+
+  if(!order){
+    return;
+  }
+
+
+  currentOpenedOrder = order;
+
+
+  detailsOrderId.textContent =
+    order.order_id || "—";
+
+
+  detailsBody.innerHTML = `
+
+    <div class="detailCard">
+
+      <div class="detailCardTitle">
+        <i class="fa-solid fa-basket-shopping"></i>
+        Products Ordered
+      </div>
+
+      <div class="orderProductsLoading">
+
+        <div class="stateSpinner"></div>
+
+        <p>
+          Loading product information...
+        </p>
+
+      </div>
+
+    </div>
+  `;
+
+
+  detailsOverlay.classList.add("open");
+
+  document.body.style.overflow = "hidden";
+
+
+  try{
+
+    const products =
+      await loadOrderedProductDetails(
+        order.items
+      );
+
+
+    /*
+      Make sure user has not closed or
+      opened another order meanwhile.
+    */
+
+    if(
+      !currentOpenedOrder ||
+      currentOpenedOrder.order_id !== order.order_id
+    ){
+      return;
+    }
+
+
+    detailsBody.innerHTML = `
+
+      <div class="detailCard">
+
+        <div class="detailCardTitle">
+          <i class="fa-solid fa-basket-shopping"></i>
+          Products Ordered
+        </div>
+
+        ${renderOrderedProductsHtml(products)}
+
+      </div>
+
+
+      <div class="detailCard">
+
+        <div class="detailCardTitle">
+          <i class="fa-solid fa-circle-info"></i>
+          Order Summary
+        </div>
+
+        <div class="detailRows">
+
+          <div class="detailRow">
+            <span>Total item quantity</span>
+            <strong>
+              ${safeNumber(order.total_items)}
+            </strong>
+          </div>
+
+          <div class="detailRow">
+            <span>Item total</span>
+            <strong>
+              ${formatMoney(order.item_total)}
+            </strong>
+          </div>
+
+          <div class="detailRow">
+            <span>Total amount</span>
+            <strong>
+              ${formatMoney(order.total_amount)}
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+
+  }catch(error){
+
+    console.error(
+      "Ordered products load error:",
+      error
+    );
+
+
+    detailsBody.innerHTML = `
+
+      <div class="dashboardState">
+
+        <i class="fa-solid fa-triangle-exclamation"></i>
+
+        <h3>Could not load products</h3>
+
+        <p>
+          ${escapeHtml(
+            error.message ||
+            "Product information is unavailable."
+          )}
+        </p>
+
+      </div>
+    `;
+
+  }
+
+};
+    /* =====================================================
+       LOAD ORDERS
+    ===================================================== */
+
+    async function loadOrders(){
+
+      refreshBtn.classList.add("loading");
+
+      showLoadingState();
+
+
+      try{
+
+        const [
+          cashResponse,
+          upiResponse
+        ] = await Promise.all([
+
+          dashboardSupabase
+            .from("cash_delivery_orders")
+            .select("*")
+            .order("created_at", {
+              ascending:false
+            }),
+
+          dashboardSupabase
+            .from("upi_orders")
+            .select("*")
+            .order("created_at", {
+              ascending:false
+            })
+
+        ]);
+
+
+        if(cashResponse.error){
+          throw cashResponse.error;
+        }
+
+        if(upiResponse.error){
+          throw upiResponse.error;
+        }
+
+
+        cashOrders =
+          (cashResponse.data || []).map(order => ({
+            ...order,
+            _order_type:"cash"
+          }));
+
+
+        upiOrders =
+          (upiResponse.data || []).map(order => ({
+            ...order,
+            _order_type:"upi"
+          }));
+
+
+        allOrders = [
+          ...cashOrders,
+          ...upiOrders
+        ].sort((a, b) => {
+
+          return (
+            new Date(b.created_at).getTime() -
+            new Date(a.created_at).getTime()
+          );
+
+        });
+
+
+        updateSummary();
+        renderFilteredOrders();
+
+      }catch(error){
+
+        console.error(
+          "Dashboard load error:",
+          error
+        );
+
+        showErrorState(
+          error.message ||
+          "Unable to load orders."
+        );
+
+      }finally{
+
+        refreshBtn.classList.remove("loading");
+
+      }
+
+    }
+
+
+    /* =====================================================
+       SUMMARY
+    ===================================================== */
+
+    function updateSummary(){
+
+      const revenue =
+        allOrders.reduce(
+          (total, order) =>
+            total + safeNumber(order.total_amount),
+          0
+        );
+
+
+      document
+        .getElementById("totalOrdersCount")
+        .textContent = allOrders.length;
+
+
+      document
+        .getElementById("cashOrdersCount")
+        .textContent = cashOrders.length;
+
+
+      document
+        .getElementById("upiOrdersCount")
+        .textContent = upiOrders.length;
+
+
+      document
+        .getElementById("totalRevenueAmount")
+        .textContent = formatMoney(revenue);
+
+
+      document
+        .getElementById("allTabCount")
+        .textContent = allOrders.length;
+
+
+      document
+        .getElementById("cashTabCount")
+        .textContent = cashOrders.length;
+
+
+      document
+        .getElementById("upiTabCount")
+        .textContent = upiOrders.length;
+
+    }
+
+
+    /* =====================================================
+       FILTER ORDERS
+    ===================================================== */
+
+    function getFilteredOrders(){
+
+      let orders;
+
+
+      if(selectedOrderType === "cash"){
+
+        orders = [...cashOrders];
+
+      }else if(selectedOrderType === "upi"){
+
+        orders = [...upiOrders];
+
+      }else{
+
+        orders = [...allOrders];
+
+      }
+
+
+      const search =
+        searchInput.value
+          .trim()
+          .toLowerCase();
+
+
+      const selectedStatus =
+        statusFilter.value;
+
+
+      const selectedMode =
+        deliveryModeFilter.value;
+
+
+      return orders.filter(order => {
+
+        const searchText = [
+          order.order_id,
+          order.user_name,
+          order.user_mobile,
+          order.village,
+          order.address,
+          order.payment_method,
+          order.payment_status,
+          order.order_status
+        ]
+        .join(" ")
+        .toLowerCase();
+
+
+        const searchMatch =
+          !search ||
+          searchText.includes(search);
+
+
+        const statusMatch =
+          selectedStatus === "all" ||
+          order.order_status === selectedStatus ||
+          (
+            selectedStatus === "cancelled" &&
+            order.order_status === "canceled"
+          );
+
+
+        const modeMatch =
+          selectedMode === "all" ||
+          order.delivery_mode === selectedMode;
+
+
+        return (
+          searchMatch &&
+          statusMatch &&
+          modeMatch
+        );
+
+      });
+
+    }
+
+
+    function renderFilteredOrders(){
+
+      const orders = getFilteredOrders();
+
+      document
+        .getElementById("ordersResultText")
+        .textContent =
+          `Showing ${orders.length} order${orders.length === 1 ? "" : "s"}`;
+
+
+      if(orders.length === 0){
+
+        showEmptyState();
+        return;
+
+      }
+
+
+      ordersDisplay.innerHTML = `
+
+        <div class="ordersTableWrap">
+
+          <table class="ordersTable">
+
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Address</th>
+                <th>Payment</th>
+                <th>Delivery</th>
+                <th>Items</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              ${orders.map(order => {
+
+                const orderIndex =
+                  allOrders.findIndex(
+                    item =>
+                      item.order_id === order.order_id &&
+                      item._order_type === order._order_type
+                  );
+
+
+                return `
+                  <tr>
+
+                    <td>
+                      <div class="orderIdText">
+                        ${escapeHtml(order.order_id)}
+                      </div>
+                    </td>
+
+
+                    <td>
+                      <div class="customerName">
+                        ${escapeHtml(order.user_name)}
+                      </div>
+
+                      <div class="customerMobile">
+                        ${escapeHtml(order.user_mobile)}
+                      </div>
+                    </td>
+
+
+                    <td>
+                      <div class="addressText">
+                        ${escapeHtml(order.address || order.village || "—")}
+                      </div>
+                    </td>
+
+
+                    <td>
+                      <span class="badge ${order._order_type}">
+                        ${
+                          order._order_type === "upi"
+                            ? '<i class="fa-solid fa-mobile-screen"></i>'
+                            : '<i class="fa-solid fa-money-bill"></i>'
+                        }
+
+                        ${getPaymentLabel(order)}
+                      </span>
+
+                      <div class="smallText">
+                        ${escapeHtml(order.payment_status || "pending")}
+                      </div>
+                    </td>
+
+
+                    <td>
+                      <span class="badge ${
+                        order.delivery_mode === "12_hours"
+                          ? "day"
+                          : "instant"
+                      }">
+                        ${getDeliveryModeLabel(order.delivery_mode)}
+                      </span>
+
+                      <div class="smallText">
+                        ${
+                          order.delivery_mode === "12_hours"
+                            ? escapeHtml(order.delivery_time || "Same day")
+                            : `${safeNumber(order.delivery_distance).toFixed(2)} km`
+                        }
+                      </div>
+                    </td>
+
+
+                   <td>
+
+  <button
+    class="viewProductsBtn"
+    type="button"
+    onclick="openOrderedProducts(${orderIndex})"
+  >
+    <i class="fa-solid fa-basket-shopping"></i>
+
+    View Products
+
+    <span>
+      (${safeNumber(order.total_items)})
+    </span>
+  </button>
+
+</td>
+
+
+                    <td>
+                      <div class="amountText">
+                        ${formatMoney(order.total_amount)}
+                      </div>
+
+                      <div class="smallText">
+                        Tip ${formatMoney(order.delivery_tip)}
+                      </div>
+                    </td>
+
+
+                    <td>
+                      <span class="badge ${escapeHtml(order.order_status || "placed")}">
+                        ${getStatusLabel(order.order_status)}
+                      </span>
+                    </td>
+
+
+                    <td>
+                      <div>
+                        ${escapeHtml(formatDate(order.created_at))}
+                      </div>
+                    </td>
+
+
+                    <td>
+                      <button
+                        class="viewBtn"
+                        type="button"
+                        onclick="openOrderDetails(${orderIndex})"
+                        aria-label="View order details"
+                      >
+                        <i class="fa-solid fa-chevron-right"></i>
+                      </button>
+                    </td>
+
+                  </tr>
+                `;
+
+              }).join("")}
+
+            </tbody>
+
+          </table>
+
+        </div>
+      `;
+
+    }
+
+
+    /* =====================================================
+       STATES
+    ===================================================== */
+
+    function showLoadingState(){
+
+      ordersDisplay.innerHTML = `
+        <div class="dashboardState">
+          <div class="stateSpinner"></div>
+          <h3>Loading orders</h3>
+          <p>Please wait while the latest orders are fetched.</p>
+        </div>
+      `;
+
+    }
+
+
+    function showEmptyState(){
+
+      ordersDisplay.innerHTML = `
+        <div class="dashboardState">
+          <i class="fa-regular fa-folder-open"></i>
+          <h3>No orders found</h3>
+          <p>Try changing the selected tab, search text or filters.</p>
+        </div>
+      `;
+
+    }
+
+
+    function showErrorState(message){
+
+      ordersDisplay.innerHTML = `
+        <div class="dashboardState">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <h3>Could not load orders</h3>
+          <p>${escapeHtml(message)}</p>
+        </div>
+      `;
+
+    }
+
+
+    /* =====================================================
+       DETAILS PANEL
+    ===================================================== */
+
+   window.openOrderDetails = async function(index){
+      const order = allOrders[index];
+
+      if(!order){
+        return;
+      }
+
+
+      currentOpenedOrder = order;
+
+      detailsOrderId.textContent =
+        order.order_id || "—";
+
+
+      const items =
+        Array.isArray(order.items)
+          ? order.items
+          : [];
+
+
+      const instructions =
+        Array.isArray(order.delivery_instructions)
+          ? order.delivery_instructions
+          : [];
+
+
+      detailsBody.innerHTML = `
+
+        <div class="detailCard">
+
+          <div class="detailCardTitle">
+            <i class="fa-solid fa-user"></i>
+            Customer
+          </div>
+
+          <div class="detailRows">
+
+            <div class="detailRow">
+              <span>Name</span>
+              <strong>${escapeHtml(order.user_name || "—")}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Mobile</span>
+              <strong>${escapeHtml(order.user_mobile || "—")}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Village</span>
+              <strong>${escapeHtml(order.village || "—")}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Full address</span>
+              <strong>${escapeHtml(order.address || "—")}</strong>
+            </div>
+
+<div class="detailRow">
+  <span>Coordinates</span>
+
+  <strong>
+    ${escapeHtml(order.latitude ?? "—")},
+    ${escapeHtml(order.longitude ?? "—")}
+  </strong>
+</div>
+
+
+${
+  Number.isFinite(Number(order.latitude)) &&
+  Number.isFinite(Number(order.longitude)) &&
+  Number(order.latitude) !== 0 &&
+  Number(order.longitude) !== 0
+
+    ? `
+      <a
+        class="viewMapBtn"
+        href="https://www.google.com/maps?q=${encodeURIComponent(order.latitude)},${encodeURIComponent(order.longitude)}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <i class="fa-solid fa-location-dot"></i>
+        View Customer Location on Maps
+      </a>
+    `
+
+    : `
+      <div class="viewMapBtn disabled">
+        <i class="fa-solid fa-location-dot"></i>
+        Location Not Available
+      </div>
+    `
+}
+
+          </div>
+
+        </div>
+
+
+        <div class="detailCard">
+
+  <div class="detailCardTitle">
+    <i class="fa-solid fa-box-open"></i>
+    Products
+  </div>
+
+  <button
+    class="viewProductsBtn"
+    type="button"
+    onclick="openOrderedProducts(${index})"
+  >
+    <i class="fa-solid fa-basket-shopping"></i>
+
+    View all ordered products
+
+    <span>
+      (${safeNumber(order.total_items)})
+    </span>
+  </button>
+
+</div>
+
+        <div class="detailCard">
+
+          <div class="detailCardTitle">
+            <i class="fa-solid fa-truck-fast"></i>
+            Delivery
+          </div>
+
+          <div class="detailRows">
+
+            <div class="detailRow">
+              <span>Delivery mode</span>
+              <strong>
+                ${getDeliveryModeLabel(order.delivery_mode)}
+              </strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Distance</span>
+              <strong>
+                ${
+                  order.delivery_distance === null ||
+                  order.delivery_distance === undefined
+                    ? "—"
+                    : `${safeNumber(order.delivery_distance).toFixed(2)} km`
+                }
+              </strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Delivery date</span>
+              <strong>${escapeHtml(order.delivery_date || "—")}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Delivery time</span>
+              <strong>${escapeHtml(order.delivery_time || "—")}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="detailCard">
+
+          <div class="detailCardTitle">
+            <i class="fa-solid fa-list-check"></i>
+            Delivery Instructions
+          </div>
+
+          <div class="instructionTags">
+
+            ${
+              instructions.length
+                ? instructions.map(text => `
+                    <span class="instructionTag">
+                      ${escapeHtml(text)}
+                    </span>
+                  `).join("")
+                : `
+                  <span class="smallText">
+                    No delivery instructions selected.
+                  </span>
+                `
+            }
+
+          </div>
+
+        </div>
+
+
+        <div class="detailCard">
+
+          <div class="detailCardTitle">
+            <i class="fa-solid fa-receipt"></i>
+            Bill Summary
+          </div>
+
+          <div class="detailRows">
+
+            <div class="detailRow">
+              <span>MRP total</span>
+              <strong>${formatMoney(order.mrp_total)}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Item total</span>
+              <strong>${formatMoney(order.item_total)}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Delivery fee</span>
+              <strong>${formatMoney(order.delivery_fee)}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Handling fee</span>
+              <strong>${formatMoney(order.handling_fee)}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Delivery tip</span>
+              <strong>${formatMoney(order.delivery_tip)}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Total savings</span>
+              <strong>${formatMoney(order.total_savings)}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Total amount</span>
+              <strong>${formatMoney(order.total_amount)}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="detailCard">
+
+          <div class="detailCardTitle">
+            <i class="fa-solid fa-credit-card"></i>
+            Payment
+          </div>
+
+          <div class="detailRows">
+
+            <div class="detailRow">
+              <span>Payment method</span>
+              <strong>${escapeHtml(getPaymentLabel(order))}</strong>
+            </div>
+
+            <div class="detailRow">
+              <span>Payment status</span>
+              <strong>${escapeHtml(order.payment_status || "—")}</strong>
+            </div>
+
+            ${
+              order._order_type === "upi"
+                ? `
+                  <div class="detailRow">
+                    <span>Transaction ID</span>
+                    <strong>${escapeHtml(order.transaction_id || "—")}</strong>
+                  </div>
+
+                  <div class="detailRow">
+                    <span>Razorpay order ID</span>
+                    <strong>${escapeHtml(order.razorpay_order_id || "—")}</strong>
+                  </div>
+
+                  <div class="detailRow">
+                    <span>Razorpay payment ID</span>
+                    <strong>${escapeHtml(order.razorpay_payment_id || "—")}</strong>
+                  </div>
+                `
+                : ""
+            }
+
+            <div class="detailRow">
+              <span>Created</span>
+              <strong>${escapeHtml(formatDate(order.created_at))}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="detailCard">
+
+          <div class="detailCardTitle">
+            <i class="fa-solid fa-pen-to-square"></i>
+            Update Order Status
+          </div>
+
+          <div class="statusUpdateBox">
+
+            <select id="detailsStatusSelect">
+
+              <option
+                value="placed"
+                ${order.order_status === "placed" ? "selected" : ""}
+              >
+                Placed
+              </option>
+
+              <option
+                value="packed"
+                ${order.order_status === "packed" ? "selected" : ""}
+              >
+                Packed
+              </option>
+
+              <option
+                value="on_the_way"
+                ${order.order_status === "on_the_way" ? "selected" : ""}
+              >
+                On the Way
+              </option>
+
+              <option
+                value="delivered"
+                ${order.order_status === "delivered" ? "selected" : ""}
+              >
+                Delivered
+              </option>
+
+              <option
+                value="cancelled"
+                ${
+                  order.order_status === "cancelled" ||
+                  order.order_status === "canceled"
+                    ? "selected"
+                    : ""
+                }
+              >
+                Cancelled
+              </option>
+
+            </select>
+
+            <button
+              id="updateStatusBtn"
+              class="updateStatusBtn"
+              type="button"
+              onclick="updateCurrentOrderStatus()"
+            >
+              Update
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+
+      detailsOverlay.classList.add("open");
+
+      document.body.style.overflow = "hidden";
+
+    };
+
+
+    function closeDetails(){
+
+      detailsOverlay.classList.remove("open");
+
+      document.body.style.overflow = "";
+
+      currentOpenedOrder = null;
+
+    }
+
+
+    /* =====================================================
+       UPDATE STATUS
+    ===================================================== */
+
+    window.updateCurrentOrderStatus = async function(){
+
+      if(!currentOpenedOrder){
+        return;
+      }
+
+
+      const select =
+        document.getElementById("detailsStatusSelect");
+
+      const button =
+        document.getElementById("updateStatusBtn");
+
+
+      const newStatus = select.value;
+
+
+      const tableName =
+        currentOpenedOrder._order_type === "upi"
+          ? "upi_orders"
+          : "cash_delivery_orders";
+
+
+      button.disabled = true;
+      button.textContent = "Updating...";
+
+
+      try{
+
+        const { error } =
+          await dashboardSupabase
+            .from(tableName)
+            .update({
+              order_status:newStatus
+            })
+            .eq(
+              "id",
+              currentOpenedOrder.id
+            );
+
+
+        if(error){
+          throw error;
+        }
+
+
+        currentOpenedOrder.order_status =
+          newStatus;
+
+
+        showToast(
+          "Order status updated successfully."
+        );
+
+
+        closeDetails();
+
+        await loadOrders();
+
+      }catch(error){
+
+        console.error(
+          "Status update error:",
+          error
+        );
+
+        showToast(
+          error.message ||
+          "Unable to update order status.",
+          true
+        );
+
+      }finally{
+
+        button.disabled = false;
+        button.textContent = "Update";
+
+      }
+
+    };
+
+
+    /* =====================================================
+       EVENTS
+    ===================================================== */
+
+    document
+      .querySelectorAll(".orderTab")
+      .forEach(tab => {
+
+        tab.addEventListener("click", function(){
+
+          document
+            .querySelectorAll(".orderTab")
+            .forEach(item =>
+              item.classList.remove("active")
+            );
+
+
+          this.classList.add("active");
+
+          selectedOrderType =
+            this.dataset.type;
+
+          renderFilteredOrders();
+
+        });
+
+      });
+
+
+    searchInput.addEventListener(
+      "input",
+      renderFilteredOrders
+    );
+
+
+    statusFilter.addEventListener(
+      "change",
+      renderFilteredOrders
+    );
+
+
+    deliveryModeFilter.addEventListener(
+      "change",
+      renderFilteredOrders
+    );
+
+
+    refreshBtn.addEventListener(
+      "click",
+      loadOrders
+    );
+
+
+    document
+      .getElementById("detailsCloseBtn")
+      .addEventListener(
+        "click",
+        closeDetails
+      );
+
+
+    detailsOverlay.addEventListener(
+      "click",
+      function(event){
+
+        if(event.target === detailsOverlay){
+          closeDetails();
+        }
+
+      }
+    );
+
+
+    document.addEventListener(
+      "keydown",
+      function(event){
+
+        if(
+          event.key === "Escape" &&
+          detailsOverlay.classList.contains("open")
+        ){
+          closeDetails();
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       START
+    ===================================================== */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      loadOrders
+    );
+  </script>
+
+</body>
+</html>
