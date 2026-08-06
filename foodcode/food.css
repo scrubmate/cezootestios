@@ -1,0 +1,353 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap');
+
+
+/* =================================
+   TANUKU FOODS BANNER
+================================= */
+
+.tanukuFoodsBanner{
+  position:relative;
+
+  width:100%;
+  height:170px;
+
+  display:flex;
+  align-items:center;
+
+  padding:16px 18px 16px 24px;
+
+  background:#DCFCE7;
+
+  overflow:hidden;
+}
+
+
+/* =================================
+   LEFT TEXT
+================================= */
+
+.tanukuFoodsText{
+  position:relative;
+  z-index:5;
+
+  width:64%;
+  max-width:64%;
+
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+
+  text-align:left;
+}
+
+
+/* Small "the" */
+
+.tanukuThe{
+  display:block;
+
+  margin:0 0 -1px 3px;
+
+  font-family:"Inter",sans-serif;
+  font-size:12px;
+  font-weight:500;
+
+  line-height:1;
+  letter-spacing:.3px;
+
+  color:#4d765c;
+}
+
+
+/* Main heading */
+
+.tanukuFoodsText h1{
+  margin:0;
+
+  font-family:"DM Serif Display",serif;
+  font-size:42px;
+  font-weight:400;
+
+  line-height:.98;
+  letter-spacing:-.9px;
+
+  color:#2f6746;
+
+  white-space:nowrap;
+}
+
+
+/* Subtitle */
+
+.tanukuFoodsText p{
+  margin:7px 0 0 3px;
+
+  font-family:"Inter",sans-serif;
+  font-size:13px;
+  font-weight:500;
+
+  line-height:1.25;
+  letter-spacing:.1px;
+
+  color:#4b735a;
+
+  white-space:nowrap;
+}
+
+.tanukuFoodStars{
+  display:inline-block;
+
+  margin-left:5px;
+
+  font-size:8px;
+  letter-spacing:2px;
+
+  color:#769b82;
+
+  transform:translateY(-1px);
+}
+
+
+/* =================================
+   RIGHT IMAGE
+================================= */
+
+.tanukuFoodsImageWrap{
+  position:absolute;
+
+  right:8px;
+  bottom:0;
+
+  z-index:3;
+
+  width:210px;
+  height:152px;
+
+  display:flex;
+  align-items:flex-end;
+  justify-content:flex-end;
+
+  overflow:hidden;
+}
+
+.tanukuFoodsImageWrap img{
+  display:block;
+
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+  object-position:right bottom;
+
+  user-select:none;
+  pointer-events:none;
+}
+
+
+/* =================================
+   SMALL SOFT CLOUDS
+================================= */
+
+.tanukuCloud{
+  position:absolute;
+  z-index:1;
+
+  width:42px;
+  height:5px;
+
+  border-radius:999px;
+
+  background:rgba(255,255,255,.15);
+
+  pointer-events:none;
+}
+
+.tanukuCloud::before,
+.tanukuCloud::after{
+  content:"";
+
+  position:absolute;
+
+  bottom:1px;
+
+  border-radius:50%;
+
+  background:inherit;
+}
+
+.tanukuCloud::before{
+  left:8px;
+
+  width:11px;
+  height:8px;
+}
+
+.tanukuCloud::after{
+  left:18px;
+
+  width:15px;
+  height:11px;
+}
+
+.cloud1{
+  top:22px;
+  left:47%;
+
+  transform:scale(.88);
+}
+
+.cloud2{
+  top:74px;
+  left:57%;
+
+  transform:scale(.66);
+}
+
+.cloud3{
+  bottom:22px;
+  left:45%;
+
+  transform:scale(.76);
+}
+
+
+/* =================================
+   TABLET
+================================= */
+
+@media(max-width:800px){
+
+  .tanukuFoodsBanner{
+    height:155px;
+  }
+
+  .tanukuFoodsText h1{
+    font-size:36px;
+  }
+
+  .tanukuFoodsText p{
+    font-size:12px;
+  }
+
+  .tanukuFoodsImageWrap{
+    width:175px;
+    height:138px;
+  }
+}
+
+
+/* =================================
+   MOBILE
+================================= */
+
+@media(max-width:600px){
+
+  .tanukuFoodsBanner{
+    height:145px;
+
+    padding:13px 10px 13px 16px;
+  }
+
+  .tanukuFoodsText{
+    width:66%;
+    max-width:66%;
+  }
+
+  .tanukuThe{
+    margin-left:2px;
+
+    font-size:10px;
+  }
+
+  .tanukuFoodsText h1{
+    font-size:31px;
+
+    line-height:1;
+    letter-spacing:-.6px;
+  }
+
+  .tanukuFoodsText p{
+    margin:6px 0 0 2px;
+
+    font-size:10px;
+    font-weight:500;
+  }
+
+  .tanukuFoodStars{
+    margin-left:3px;
+
+    font-size:6px;
+    letter-spacing:1px;
+  }
+
+  .tanukuFoodsImageWrap{
+    right:2px;
+
+    width:140px;
+    height:124px;
+  }
+
+  .tanukuCloud{
+    width:34px;
+    height:4px;
+  }
+
+  .tanukuCloud::before{
+    width:9px;
+    height:7px;
+  }
+
+  .tanukuCloud::after{
+    width:12px;
+    height:9px;
+  }
+
+  .cloud1{
+    top:15px;
+    left:48%;
+  }
+
+  .cloud2{
+    top:59px;
+    left:59%;
+  }
+
+  .cloud3{
+    bottom:16px;
+    left:47%;
+  }
+}
+
+
+/* =================================
+   SMALL MOBILE
+================================= */
+
+@media(max-width:370px){
+
+  .tanukuFoodsBanner{
+    height:132px;
+
+    padding-left:14px;
+  }
+
+  .tanukuThe{
+    font-size:9px;
+  }
+
+  .tanukuFoodsText h1{
+    font-size:27px;
+  }
+
+  .tanukuFoodsText p{
+    margin-top:5px;
+
+    font-size:9px;
+  }
+
+  .tanukuFoodsImageWrap{
+    width:124px;
+    height:110px;
+  }
+}

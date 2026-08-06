@@ -1,0 +1,1096 @@
+.profile{
+  position:relative;
+  width:38px;
+  height:38px;
+  overflow:hidden;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.profile img{
+  position:relative;
+  z-index:2;
+
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+  display:block;
+
+  opacity:0;
+  transition:opacity .2s ease;
+}
+
+.profile img.profileLoaded{
+  opacity:1;
+}
+
+.profile .Dera{
+  position:absolute;
+  inset:0;
+  z-index:1;
+
+  border-radius:50%;
+  overflow:hidden;
+  background:#eeeeee;
+}
+
+.profile .Dera::after{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  transform:translateX(-100%);
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.9),
+    transparent
+  );
+
+  animation:DeraProfileMove 1.1s infinite;
+}
+
+@keyframes DeraProfileMove{
+  100%{
+    transform:translateX(100%);
+  }
+}
+
+/* Category Pink Shimmer */
+
+.cat-item{
+    position:relative;
+}
+
+.catPinkShimmer{
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translateX(-50%);
+
+    width:28px;
+    height:28px;
+    border-radius:10px;
+
+    background:#ffe4ef;
+    overflow:hidden;
+}
+
+.catPinkShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:catPinkMove .9s linear infinite;
+}
+
+@keyframes catPinkMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.cat-item img{
+    opacity:0;
+    transition:.2s;
+}
+
+.cat-item img.loaded{
+    opacity:1;
+}
+
+.posterShimmer{
+    position:absolute;
+    inset:0;
+    background:#ffe6ef;
+    overflow:hidden;
+    border-radius:inherit;
+}
+
+.posterShimmer.small{
+    border-radius:0;
+}
+
+.posterShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    transform:translateX(-100%);
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.9),
+        transparent
+    );
+    animation:posterShimmerMove 1s linear infinite;
+}
+
+@keyframes posterShimmerMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.hero-img,
+.brand-icons,
+.product-img{
+    position:relative;
+}
+
+.posterLazy{
+    opacity:0;
+    transition:.2s;
+}
+
+.posterLazy.posterLoaded{
+    opacity:1;
+}
+.BordiWrap{
+    position:relative;
+}
+
+.BordiShimmer{
+    position:absolute;
+    inset:0;
+    background:#ffe6ef;
+    overflow:hidden;
+}
+
+.BordiShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    transform:translateX(-100%);
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.9),
+        transparent
+    );
+    animation:BordiMove 1s linear infinite;
+}
+
+@keyframes BordiMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.BordiLazy{
+    opacity:0;
+    transition:.2s;
+}
+
+.BordiLazy.BordiLoaded{
+    opacity:1;
+}
+.singleImageSection{
+  width:100%;
+  padding:100px 0;
+  margin:0;
+  background:#fff;
+}
+
+.BalarampurImageWrap{
+  position:relative;
+  width:100%;
+  line-height:0;
+}
+
+.singleImage{
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:cover;
+  border-radius:0;
+
+  opacity:0;
+  transition:opacity .25s ease;
+}
+
+.singleImage.BalarampurLoaded{
+  opacity:1;
+}
+
+.BalarampurShimmer{
+  position:absolute;
+  top:0;
+  left:0;
+
+  width:100%;
+  height:100%;
+
+  background:#ffe6ef;
+
+  overflow:hidden;
+  z-index:1;
+}
+
+.BalarampurShimmer::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-150%;
+
+  width:55%;
+  height:100%;
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.95),
+    transparent
+  );
+
+  animation:BalarampurMove 1.1s linear infinite;
+}
+
+@keyframes BalarampurMove{
+  100%{
+    left:150%;
+  }
+}
+
+.IceShapeShimmer{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    pointer-events:none;
+}
+
+.IceShapeShimmer::before{
+    content:"";
+
+    width:42px;
+    height:54px;
+
+    border-radius:22px 22px 16px 16px;
+
+    background:linear-gradient(
+        90deg,
+        #d6a679 0%,
+        #f6e3cf 50%,
+        #d6a679 100%
+    );
+
+    background-size:220% 100%;
+
+    animation:iceSkeleton 1.1s linear infinite;
+}
+
+.IceShapeShimmer::after{
+    content:"";
+
+    position:absolute;
+
+    width:10px;
+    height:22px;
+
+    background:linear-gradient(
+        90deg,
+        #b98457 0%,
+        #e7c8a8 50%,
+        #b98457 100%
+    );
+
+    background-size:220% 100%;
+
+    border-radius:8px;
+
+    margin-top:58px;
+
+    animation:iceSkeleton 1.1s linear infinite;
+}
+
+@keyframes iceSkeleton{
+    from{
+        background-position:200% 0;
+    }
+    to{
+        background-position:-200% 0;
+    }
+}
+.launchCard{
+    position:relative;
+}
+
+.LaunchShimmer{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+
+    width:68px;
+    height:68px;
+
+    border-radius:12px;
+    background:#eef2f6;
+    overflow:hidden;
+}
+
+.LaunchShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    transform:translateX(-100%);
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.9),
+        transparent
+    );
+    animation:LaunchMove 1s linear infinite;
+}
+
+@keyframes LaunchMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.LaunchLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.LaunchLazy.LaunchLoaded{
+    opacity:1;
+}
+.BannerMiniWrap{
+    position:relative;
+    overflow:hidden;
+}
+
+.BannerMiniShimmer{
+    position:absolute;
+    inset:0;
+
+    background:#ececec;
+    overflow:hidden;
+    z-index:1;
+}
+
+.BannerMiniShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:BannerMiniMove 1s linear infinite;
+}
+
+@keyframes BannerMiniMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.BannerMiniLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.BannerMiniLazy.BannerMiniLoaded{
+    opacity:1;
+}
+.FruitBannerWrap{
+    position:relative;
+    overflow:hidden;
+}
+
+.FruitBannerShimmer{
+    position:absolute;
+    inset:0;
+    background:#eef7e9;
+    z-index:1;
+    overflow:hidden;
+}
+
+.FruitBannerShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:FruitBannerMove 1s linear infinite;
+}
+
+@keyframes FruitBannerMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.FruitBannerLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.FruitBannerLazy.FruitBannerLoaded{
+    opacity:1;
+}
+.CoolBottomWrap{
+    position:relative;
+    overflow:hidden;
+}
+
+.CoolBottomShimmer{
+    position:absolute;
+    inset:0;
+    background:#dff6ff;
+    overflow:hidden;
+    z-index:1;
+}
+
+.CoolBottomShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:CoolBottomMove 1s linear infinite;
+}
+
+@keyframes CoolBottomMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.CoolBottomLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.CoolBottomLazy.CoolBottomLoaded{
+    opacity:1;
+}.BijnorWrap{
+    position:relative;
+    overflow:hidden;
+}
+
+.BijnorShimmer{
+    position:absolute;
+    inset:0;
+    background:#eef8e6;
+    overflow:hidden;
+    z-index:1;
+}
+
+.BijnorShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:BijnorMove 1s linear infinite;
+}
+
+@keyframes BijnorMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.BijnorLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.BijnorLazy.BijnorLoaded{
+    opacity:1;
+}
+.skin-banner{
+    position:relative;
+    overflow:hidden;
+}
+
+.SkinShimmer{
+    position:absolute;
+    inset:0;
+    background:#fdecef;
+    z-index:1;
+    overflow:hidden;
+}
+
+.SkinShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:SkinMove 1s linear infinite;
+}
+
+@keyframes SkinMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.SkinLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.SkinLazy.SkinLoaded{
+    opacity:1;
+}.DeoriaWrap{
+    position:relative;
+    overflow:hidden;
+}
+
+.DeoriaShimmer{
+    position:absolute;
+    inset:0;
+    background:#fdecef;
+    overflow:hidden;
+    z-index:1;
+}
+
+.DeoriaShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:DeoriaMove 1s linear infinite;
+}
+
+@keyframes DeoriaMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.DeoriaLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.DeoriaLazy.DeoriaLoaded{
+    opacity:1;
+}
+.FaizabadWrap{
+    position:relative;
+    overflow:hidden;
+}
+
+.FaizabadShimmer{
+    position:absolute;
+    inset:0;
+    background:#ffe8d6;
+    overflow:hidden;
+    z-index:1;
+}
+
+.FaizabadShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:FaizabadMove 1s linear infinite;
+}
+
+@keyframes FaizabadMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.FaizabadLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.FaizabadLazy.FaizabadLoaded{
+    opacity:1;
+}.wiproPinkLeftWrap,
+.wiproPinkRightWrap{
+  position:absolute;
+  width:235px;
+  height:180px;
+  bottom:14px;
+  overflow:hidden;
+  z-index:5;
+}
+
+.wiproPinkLeftWrap{
+  left:-22px;
+  transform:rotate(-4deg);
+}
+
+.wiproPinkRightWrap{
+  right:-22px;
+  transform:rotate(4deg);
+}
+
+.wiproPinkLeftWrap .wiproItem,
+.wiproPinkRightWrap .wiproItem{
+  position:absolute;
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+  transform:none;
+  left:auto;
+  right:auto;
+  bottom:auto;
+}
+
+.WiproPinkShimmer{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  overflow:hidden;
+  background:#ffe4ef;
+}
+
+.WiproPinkShimmer::after{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  transform:translateX(-100%);
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.95),
+    transparent
+  );
+
+  animation:WiproPinkMove 1s linear infinite;
+}
+
+@keyframes WiproPinkMove{
+  100%{
+    transform:translateX(100%);
+  }
+}
+
+.WiproPinkLazy{
+  opacity:0;
+  transition:opacity .25s ease;
+}
+
+.WiproPinkLazy.WiproPinkLoaded{
+  opacity:1;
+}
+
+@media(max-width:480px){
+
+  .wiproPinkLeftWrap,
+  .wiproPinkRightWrap{
+    width:145px;
+    height:130px;
+    bottom:10px;
+  }
+
+  .wiproPinkLeftWrap{
+    left:-16px;
+  }
+
+  .wiproPinkRightWrap{
+    right:-16px;
+  }
+}
+
+.FatehpurWrap{
+    position:relative;
+    overflow:hidden;
+}
+
+.FatehpurShimmer{
+    position:absolute;
+    inset:0;
+    background:#eef7e9;
+    overflow:hidden;
+    z-index:1;
+}
+
+.FatehpurShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:FatehpurMove 1s linear infinite;
+}
+
+@keyframes FatehpurMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.FatehpurLazy{
+    opacity:0;
+    transition:.25s;
+}
+
+.FatehpurLazy.FatehpurLoaded{
+    opacity:1;
+}
+/* ================= NAV CONTENT ================= */
+
+.nav-item{
+    position:relative;
+}
+
+.NavContent{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+
+    opacity:0;
+    transition:opacity .25s ease;
+
+    position:relative;
+    z-index:2;
+}
+
+.NavContent.NavLoaded{
+    opacity:1;
+}
+
+/* ================= SHIMMER ================= */
+
+.NavPinkShimmer{
+    position:absolute;
+
+    top:0;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:34px;
+    height:34px;
+
+    border-radius:12px;
+
+    background:#ffe7f1;
+
+    overflow:hidden;
+
+    z-index:1;
+
+    pointer-events:none;
+}
+
+.NavPinkShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:NavPinkMove 1s linear infinite;
+}
+
+@keyframes NavPinkMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+/* Banner shimmer */
+
+.NavBannerShimmer{
+    width:48px;
+    height:48px;
+
+    border-radius:15px;
+
+    top:-5px;
+}
+/* ================= HARDOI SHIMMER ================= */
+
+.category-card{
+    position:relative;
+}
+
+.HardoiShimmer{
+    position:absolute;
+
+    top:8px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:54px;
+    height:54px;
+
+    border-radius:18px;
+
+    background:#ffe7f1;
+
+    overflow:hidden;
+
+    z-index:1;
+
+    pointer-events:none;
+}
+
+.HardoiShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:HardoiMove 1s linear infinite;
+}
+
+@keyframes HardoiMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.HardoiLazy{
+    opacity:0;
+    transition:opacity .25s ease;
+
+    position:relative;
+    z-index:2;
+}
+
+.HardoiLazy.HardoiLoaded{
+    opacity:1;
+}
+
+.category-card p{
+    opacity:0;
+    transition:opacity .25s ease;
+}
+
+.category-card.HardoiLoaded p{
+    opacity:1;
+}.PrinterWrap{
+    position:relative;
+}
+
+.PrinterShapeShimmer{
+    position:absolute;
+
+    left:50%;
+    top:42%;
+
+    transform:translate(-50%,-50%);
+
+    width:95px;
+    height:95px;
+
+    border-radius:22px;
+
+    background:#ffe7f1;
+
+    overflow:hidden;
+
+    z-index:1;
+
+    pointer-events:none;
+}
+
+.PrinterShapeShimmer::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:PrinterShapeMove 1s linear infinite;
+}
+
+@keyframes PrinterShapeMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.PrinterLazy{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+
+    opacity:0;
+    transition:.25s;
+
+    position:relative;
+    z-index:2;
+}
+
+.PrinterLazy.PrinterLoaded{
+    opacity:1;
+}
+/* ================= BRAND PINK SHIMMER ================= */
+
+.product-area{
+    position:relative;
+    overflow:hidden;
+}
+
+.BrandShimmer{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:82px;
+    height:82px;
+
+    border-radius:22px;
+
+    background:#ffe7f1;
+
+    overflow:hidden;
+
+    z-index:1;
+
+    pointer-events:none;
+}
+
+.BrandShimmer::after{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    transform:translateX(-100%);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.95),
+        transparent
+    );
+
+    animation:BrandShimmerMove 1s linear infinite;
+}
+
+@keyframes BrandShimmerMove{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.BrandLazy{
+    opacity:0;
+
+    position:relative;
+    z-index:2;
+
+    transition:opacity .25s ease;
+}
+
+.BrandLazy.BrandLoaded{
+    opacity:1;
+}
