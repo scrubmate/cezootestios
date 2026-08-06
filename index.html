@@ -19389,5 +19389,94 @@ setInterval(() => {
 })();
 </script>
 
+
+<!-- =========================================================
+     PROFILE CLICK FIX FOR CEZOO / FOOD / SPECIAL
+     Only adds shared profile accessibility; all other code stays unchanged.
+========================================================== -->
+<style>
+  /* Keep the shared top profile above Food and Special content. */
+  #topSection .top-bar{
+    position:relative;
+    z-index:10050;
+  }
+
+  #topSection .profile{
+    position:relative;
+    z-index:10060;
+    pointer-events:auto !important;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+
+  #topSection .profile img{
+    pointer-events:none;
+  }
+
+  body[data-cezoo-mode="food"] #topSection .profile,
+  body[data-cezoo-mode="special"] #topSection .profile{
+    display:flex !important;
+    pointer-events:auto !important;
+  }
+</style>
+
+<script>
+(function enableSharedProfileForEveryMode(){
+  "use strict";
+
+  const profileButton = document.querySelector("#topSection .profile");
+  const profilePopup = document.getElementById("cezooProfilePopup");
+
+  function readCezooUser(){
+    try{
+      return JSON.parse(localStorage.getItem("cezooUser") || "null");
+    }catch(error){
+      return null;
+    }
+  }
+
+  window.openCezooProfile = function openCezooProfile(){
+    const user = readCezooUser();
+    const loggedIn = Boolean(
+      user &&
+      user.name &&
+      user.mobile &&
+      user.login === true
+    );
+
+    if(!loggedIn){
+      if(typeof window.openLoginPopup === "function"){
+        window.openLoginPopup();
+      }
+      return;
+    }
+
+    if(!profilePopup){
+      console.error("CEZOO profile popup was not found.");
+      return;
+    }
+
+    profilePopup.classList.add("open");
+    document.body.style.overflow = "hidden";
+  };
+
+  /* The inline onclick remains unchanged. This listener also supports
+     touch/click handling when Food or Special mode is active. */
+  if(profileButton){
+    profileButton.setAttribute("role", "button");
+    profileButton.setAttribute("tabindex", "0");
+    profileButton.setAttribute("aria-label", "Open profile");
+
+    profileButton.addEventListener("keydown", function(event){
+      if(event.key === "Enter" || event.key === " "){
+        event.preventDefault();
+        window.openCezooProfile();
+      }
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
