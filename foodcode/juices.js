@@ -234,12 +234,11 @@
 
         background:#fff;
 
-        padding:
-          6px
-          0
-          78px;
+        padding:6px 0 12px;
 
-        overflow:hidden;
+        overflow:visible;
+
+        position:relative;
 
         font-family:
           Inter,
@@ -247,6 +246,29 @@
           BlinkMacSystemFont,
           "Segoe UI",
           sans-serif;
+      }
+
+
+      /* =====================================
+         REFRESHMENT DIVIDER LINE
+      ===================================== */
+
+      .cezooRefreshmentBlackLine{
+        display:block;
+        position:relative;
+        clear:both;
+
+        width:calc(100% - 24px);
+        height:1px;
+
+        margin:4px 12px 14px;
+        padding:0;
+
+        background:#111;
+
+        border:0;
+
+        z-index:1;
       }
 
 
@@ -292,10 +314,10 @@
         flex:
           0
           0
-          118px;
+          98px;
 
-        width:118px;
-        min-width:118px;
+        width:98px;
+        min-width:98px;
 
         cursor:pointer;
 
@@ -311,8 +333,8 @@
       .czRImageBox{
         position:relative;
 
-        width:118px;
-        height:118px;
+        width:98px;
+        height:98px;
 
         overflow:hidden;
 
@@ -345,11 +367,11 @@
       .czRAdd{
         position:absolute;
 
-        right:7px;
-        bottom:7px;
+        right:5px;
+        bottom:5px;
 
-        width:39px;
-        height:36px;
+        width:34px;
+        height:32px;
 
         display:flex;
 
@@ -370,7 +392,7 @@
 
         color:#18a568;
 
-        font-size:24px;
+        font-size:21px;
         font-weight:600;
 
         line-height:1;
@@ -400,17 +422,17 @@
       .czRQty{
         position:absolute;
 
-        right:7px;
-        bottom:7px;
+        right:5px;
+        bottom:5px;
 
-        height:36px;
+        height:32px;
 
         display:grid;
 
         grid-template-columns:
-          30px
-          26px
-          30px;
+          27px
+          22px
+          27px;
 
         align-items:center;
         justify-items:center;
@@ -430,8 +452,8 @@
 
 
       .czRQty button{
-        width:30px;
-        height:36px;
+        width:27px;
+        height:32px;
 
         display:flex;
 
@@ -464,8 +486,8 @@
 
 
       .czRQty span{
-        width:26px;
-        height:36px;
+        width:22px;
+        height:32px;
 
         display:flex;
 
@@ -510,7 +532,7 @@
 
         color:#282828;
 
-        font-size:13px;
+        font-size:12px;
         font-weight:600;
 
         line-height:1.2;
@@ -1256,16 +1278,16 @@
 
 
         .czRCard{
-          flex-basis:110px;
+          flex-basis:92px;
 
-          width:110px;
-          min-width:110px;
+          width:92px;
+          min-width:92px;
         }
 
 
         .czRImageBox{
-          width:110px;
-          height:110px;
+          width:92px;
+          height:92px;
         }
 
 
@@ -1339,16 +1361,16 @@
       @media(max-width:370px){
 
         .czRCard{
-          flex-basis:103px;
+          flex-basis:86px;
 
-          width:103px;
-          min-width:103px;
+          width:86px;
+          min-width:86px;
         }
 
 
         .czRImageBox{
-          width:103px;
-          height:103px;
+          width:86px;
+          height:86px;
         }
 
 
