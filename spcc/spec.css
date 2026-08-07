@@ -22,27 +22,6 @@
 }
 
 
-/* soft background glow */
-
-.cezooBirthdayBanner::before{
-  content:"";
-
-  position:absolute;
-
-  width:260px;
-  height:260px;
-
-  left:-80px;
-  top:-110px;
-
-  border-radius:50%;
-
-  background:rgba(255,255,255,.20);
-
-  pointer-events:none;
-}
-
-
 /* =========================================
    LEFT CONTENT
 ========================================= */
@@ -61,8 +40,6 @@
 
   padding-left:23px;
 
-  transform:translateY(-1px);
-
   font-family:"League Spartan",sans-serif;
 }
 
@@ -74,8 +51,8 @@
 .cezooBirthdaySmall{
   display:block;
 
-  margin-left:36px;
-  margin-bottom:4px;
+  margin-left:35px;
+  margin-bottom:5px;
 
   font-family:"League Spartan",sans-serif;
 
@@ -86,14 +63,13 @@
 
   color:#d63d7b;
 
-  transform:rotate(-6deg);
-
+  transform:rotate(-5deg);
   transform-origin:left bottom;
 }
 
 
 /* =========================================
-   COMMON LETTER STYLE
+   COMMON WORD STYLE
 ========================================= */
 
 .cezooBirthdayWord{
@@ -114,8 +90,8 @@
   white-space:nowrap;
 
   text-shadow:
-    0 2px 0 rgba(206,61,120,.14),
-    0 4px 7px rgba(181,54,107,.16);
+    0 2px 0 rgba(206,61,120,.12),
+    0 3px 6px rgba(181,54,107,.12);
 }
 
 
@@ -127,34 +103,32 @@
 
 
 /* =========================================
-   BIRTHDAY
+   BIRTHDAY — CURVED
 ========================================= */
 
 .cezooBirthdayWordTop{
   font-size:39px;
 
-  line-height:.78;
+  line-height:.8;
 
   letter-spacing:-3px;
 }
 
 
-/* stronger curved BIRTHDAY */
-
 .cezooBirthdayWordTop span:nth-child(1){
-  transform:translateY(8px) rotate(-11deg);
+  transform:translateY(7px) rotate(-10deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(2){
-  transform:translateY(4px) rotate(-8deg);
+  transform:translateY(3px) rotate(-7deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(3){
-  transform:translateY(1px) rotate(-5deg);
+  transform:translateY(0) rotate(-4deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(4){
-  transform:translateY(-2px) rotate(-2deg);
+  transform:translateY(-3px) rotate(-2deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(5){
@@ -166,86 +140,53 @@
 }
 
 .cezooBirthdayWordTop span:nth-child(7){
-  transform:translateY(2px) rotate(7deg);
+  transform:translateY(1px) rotate(7deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(8){
-  transform:translateY(7px) rotate(11deg);
+  transform:translateY(6px) rotate(10deg);
 }
 
 
 /* =========================================
-   BASH — STRONG CURVE
+   BASH — STRAIGHT
 ========================================= */
 
 .cezooBirthdayWordBottom{
   position:relative;
 
-  margin-top:12px;
-  margin-left:43px;
+  margin-top:11px;
 
-  font-size:45px;
+  /* moved left */
+  margin-left:18px;
 
-  line-height:.72;
+  padding:0;
+
+  font-size:43px;
+
+  line-height:.8;
 
   letter-spacing:-3px;
 
-  transform:rotate(-2deg);
+  transform:none;
 }
 
 
-/*
-   BASH is now a clear upward arch.
-   Middle letters are higher,
-   outer letters sit lower.
-*/
+/* keep all BASH letters straight */
 
-.cezooBirthdayWordBottom span:nth-child(1){
-  transform:
-    translateY(8px)
-    rotate(-11deg);
-}
-
-.cezooBirthdayWordBottom span:nth-child(2){
-  transform:
-    translateY(-3px)
-    rotate(-4deg)
-    scale(1.04);
-}
-
-.cezooBirthdayWordBottom span:nth-child(3){
-  transform:
-    translateY(-5px)
-    rotate(4deg)
-    scale(1.04);
-}
-
+.cezooBirthdayWordBottom span:nth-child(1),
+.cezooBirthdayWordBottom span:nth-child(2),
+.cezooBirthdayWordBottom span:nth-child(3),
 .cezooBirthdayWordBottom span:nth-child(4){
-  transform:
-    translateY(8px)
-    rotate(11deg);
+  transform:none;
 }
 
 
-/* small curved underline under BASH */
+/* remove underline completely */
 
 .cezooBirthdayWordBottom::after{
-  content:"";
-
-  position:absolute;
-
-  left:5px;
-  right:0;
-
-  bottom:-15px;
-
-  height:14px;
-
-  border-bottom:3px solid rgba(214,61,123,.42);
-
-  border-radius:0 0 50% 50%;
-
-  transform:rotate(2deg);
+  display:none !important;
+  content:none !important;
 }
 
 
@@ -278,7 +219,6 @@
   height:100%;
 
   object-fit:contain;
-
   object-position:right bottom;
 
   user-select:none;
@@ -289,7 +229,7 @@
 
 
 /* =========================================
-   CSS RIBBONS
+   RIBBONS
 ========================================= */
 
 .cezooRibbon{
@@ -297,19 +237,18 @@
 
   z-index:2;
 
-  width:30px;
-  height:11px;
+  width:28px;
+  height:10px;
 
   border:4px solid transparent;
-  border-top-color:#ec6ca1;
+
+  border-top-color:#ed78a8;
 
   border-radius:50%;
 
   pointer-events:none;
 }
 
-
-/* left lower ribbon */
 
 .ribbon1{
   left:7%;
@@ -319,38 +258,32 @@
 }
 
 
-/* middle ribbon */
-
 .ribbon2{
-  left:48%;
+  left:49%;
   top:28px;
 
-  width:24px;
+  width:23px;
 
-  border-top-color:#f8a5c7;
+  border-top-color:#f39cbe;
 
   transform:rotate(-28deg);
 }
 
 
-/* right ribbon */
-
 .ribbon3{
   right:7%;
   top:22px;
 
-  width:26px;
+  width:25px;
 
-  border-top-color:#ffffff;
-
-  opacity:.75;
+  border-top-color:rgba(255,255,255,.75);
 
   transform:rotate(33deg);
 }
 
 
 /* =========================================
-   LITTLE DECORATIVE DOTS
+   SMALL DECORATIVE DOTS
 ========================================= */
 
 .cezooBirthdayDot{
@@ -374,6 +307,7 @@
   bottom:25px;
 }
 
+
 .dot2{
   right:24%;
   top:20px;
@@ -383,6 +317,7 @@
 
   background:#fff;
 }
+
 
 .dot3{
   right:8%;
@@ -409,18 +344,23 @@
       minmax(0,45%);
   }
 
+
   .cezooBirthdayContent{
     padding-left:18px;
   }
+
 
   .cezooBirthdayWordTop{
     font-size:35px;
   }
 
-  .cezooBirthdayWordBottom{
-    font-size:40px;
 
-    margin-left:40px;
+  .cezooBirthdayWordBottom{
+    margin-top:9px;
+
+    margin-left:16px;
+
+    font-size:39px;
   }
 }
 
@@ -446,7 +386,7 @@
 
 
   .cezooBirthdaySmall{
-    margin-left:25px;
+    margin-left:24px;
     margin-bottom:3px;
 
     font-size:9px;
@@ -460,18 +400,16 @@
   }
 
 
-  /* Birthday mobile curve */
-
   .cezooBirthdayWordTop span:nth-child(1){
-    transform:translateY(6px) rotate(-10deg);
+    transform:translateY(5px) rotate(-9deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(2){
-    transform:translateY(3px) rotate(-7deg);
+    transform:translateY(2px) rotate(-6deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(3){
-    transform:translateY(0) rotate(-4deg);
+    transform:translateY(0) rotate(-3deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(4){
@@ -483,63 +421,33 @@
   }
 
   .cezooBirthdayWordTop span:nth-child(6){
-    transform:translateY(-2px) rotate(4deg);
+    transform:translateY(-2px) rotate(3deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(7){
-    transform:translateY(1px) rotate(7deg);
+    transform:translateY(1px) rotate(6deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(8){
-    transform:translateY(6px) rotate(10deg);
+    transform:translateY(5px) rotate(9deg);
   }
 
 
-  /* BASH mobile */
+  /* BASH */
 
   .cezooBirthdayWordBottom{
-    margin-top:10px;
-    margin-left:31px;
+    margin-top:8px;
 
-    font-size:33px;
+    /* pushed left */
+    margin-left:12px;
+
+    padding:0;
+
+    font-size:32px;
+
+    line-height:.8;
 
     letter-spacing:-2px;
-  }
-
-
-  .cezooBirthdayWordBottom span:nth-child(1){
-    transform:
-      translateY(7px)
-      rotate(-12deg);
-  }
-
-  .cezooBirthdayWordBottom span:nth-child(2){
-    transform:
-      translateY(-4px)
-      rotate(-4deg)
-      scale(1.05);
-  }
-
-  .cezooBirthdayWordBottom span:nth-child(3){
-    transform:
-      translateY(-5px)
-      rotate(4deg)
-      scale(1.05);
-  }
-
-  .cezooBirthdayWordBottom span:nth-child(4){
-    transform:
-      translateY(7px)
-      rotate(12deg);
-  }
-
-
-  .cezooBirthdayWordBottom::after{
-    bottom:-11px;
-
-    height:10px;
-
-    border-bottom-width:2px;
   }
 
 
@@ -550,12 +458,14 @@
     transform:scale(.75) rotate(18deg);
   }
 
+
   .ribbon2{
     left:51%;
     top:17px;
 
     transform:scale(.75) rotate(-28deg);
   }
+
 
   .ribbon3{
     right:4%;
@@ -587,7 +497,7 @@
 
 
   .cezooBirthdaySmall{
-    margin-left:21px;
+    margin-left:20px;
 
     font-size:8px;
   }
@@ -599,9 +509,10 @@
 
 
   .cezooBirthdayWordBottom{
-    margin-left:27px;
-    margin-top:9px;
+    margin-top:7px;
 
-    font-size:29px;
+    margin-left:10px;
+
+    font-size:28px;
   }
 }
