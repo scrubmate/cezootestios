@@ -370,3 +370,478 @@
     height:118%;
   }
 }
+
+/* =========================================
+   3 SPECIAL HANGERS
+========================================= */
+
+.cezooSpecialHangers{
+  position:relative;
+
+  width:100%;
+
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+
+  gap:12px;
+
+  padding:0 14px 22px;
+
+  background:#fff;
+
+  overflow:hidden;
+}
+
+
+/* =========================================
+   EACH HANGER
+========================================= */
+
+.cezooSpecialHanger{
+  position:relative;
+
+  width:100%;
+  min-width:0;
+
+  height:86px;
+
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+
+  transform-origin:50% 0;
+
+  will-change:transform;
+
+  animation:
+    cezooSpecialSwing 3.8s ease-in-out infinite;
+
+  animation-play-state:paused;
+}
+
+
+/* slightly different timing */
+
+.hangerTwo{
+  animation-delay:-1.1s;
+}
+
+.hangerThree{
+  animation-delay:-2.2s;
+}
+
+
+/* Run ONLY when visible */
+
+.cezooSpecialHangers.is-visible
+.cezooSpecialHanger{
+  animation-play-state:running;
+}
+
+
+/* =========================================
+   STRINGS
+========================================= */
+
+.hangerString{
+  position:absolute;
+
+  top:0;
+
+  width:1px;
+  height:27px;
+
+  background:#d48aa7;
+
+  transform-origin:top center;
+}
+
+
+/* Left string */
+
+.leftString{
+  left:31%;
+
+  transform:rotate(10deg);
+}
+
+
+/* Right string */
+
+.rightString{
+  right:31%;
+
+  transform:rotate(-10deg);
+}
+
+
+/* =========================================
+   BOARD
+========================================= */
+
+.hangerBoard{
+  position:absolute;
+
+  top:24px;
+  left:0;
+  right:0;
+
+  width:100%;
+  min-width:0;
+  min-height:44px;
+
+  padding:8px 7px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid #f0b5ce;
+  border-radius:10px;
+
+  background:#ffd8eb;
+
+  color:#bf4779;
+
+  font-family:"League Spartan",sans-serif;
+
+  font-size:13px;
+  font-weight:700;
+
+  line-height:1.15;
+
+  text-align:center;
+
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+
+  box-shadow:
+    0 4px 10px rgba(191,71,121,.08);
+
+  box-sizing:border-box;
+}
+
+
+/* Different soft pink */
+
+.hangerTwo .hangerBoard{
+  background:#ffe3ef;
+}
+
+.hangerThree .hangerBoard{
+  background:#ffd3e7;
+}
+
+
+/* =========================================
+   SWING — LIGHT GPU ANIMATION
+========================================= */
+
+@keyframes cezooSpecialSwing{
+
+  0%,
+  100%{
+    transform:rotate(-1.5deg);
+  }
+
+  50%{
+    transform:rotate(1.5deg);
+  }
+}
+
+
+/* =========================================
+   HEART AREA
+========================================= */
+
+.hangerHearts{
+  position:absolute;
+
+  left:50%;
+  bottom:4px;
+
+  width:38px;
+  height:32px;
+
+  transform:translateX(-50%);
+
+  pointer-events:none;
+}
+
+
+/* =========================================
+   CSS-ONLY HEART
+========================================= */
+
+.hangerHeart{
+  position:absolute;
+
+  left:50%;
+  bottom:0;
+
+  width:8px;
+  height:8px;
+
+  background:#ed72a3;
+
+  transform:
+    translate3d(-50%,0,0)
+    rotate(45deg)
+    scale(.8);
+
+  opacity:0;
+
+  will-change:transform,opacity;
+
+  animation:
+    cezooHeartFloat 3.2s ease-out infinite;
+
+  animation-play-state:paused;
+}
+
+
+/* heart circles */
+
+.hangerHeart::before,
+.hangerHeart::after{
+  content:"";
+
+  position:absolute;
+
+  width:8px;
+  height:8px;
+
+  border-radius:50%;
+
+  background:inherit;
+}
+
+
+.hangerHeart::before{
+  left:-4px;
+  top:0;
+}
+
+
+.hangerHeart::after{
+  left:0;
+  top:-4px;
+}
+
+
+/* Second small heart */
+
+.hangerHeart.heart2{
+  left:65%;
+
+  width:6px;
+  height:6px;
+
+  background:#f39abc;
+
+  animation-delay:-1.6s;
+}
+
+
+.hangerHeart.heart2::before,
+.hangerHeart.heart2::after{
+  width:6px;
+  height:6px;
+}
+
+
+.hangerHeart.heart2::before{
+  left:-3px;
+}
+
+
+.hangerHeart.heart2::after{
+  top:-3px;
+}
+
+
+/* Hearts only run while section visible */
+
+.cezooSpecialHangers.is-visible
+.hangerHeart{
+  animation-play-state:running;
+}
+
+
+/* =========================================
+   FLOAT HEART
+========================================= */
+
+@keyframes cezooHeartFloat{
+
+  0%{
+    opacity:0;
+
+    transform:
+      translate3d(-50%,5px,0)
+      rotate(45deg)
+      scale(.55);
+  }
+
+  18%{
+    opacity:.85;
+  }
+
+  70%{
+    opacity:.55;
+  }
+
+  100%{
+    opacity:0;
+
+    transform:
+      translate3d(-50%,-24px,0)
+      rotate(45deg)
+      scale(.9);
+  }
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media(max-width:800px){
+
+  .cezooSpecialHangers{
+    gap:9px;
+
+    padding-left:11px;
+    padding-right:11px;
+  }
+
+  .hangerBoard{
+    font-size:12px;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:600px){
+
+  .cezooSpecialHangers{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+
+    gap:6px;
+
+    padding:
+      0
+      7px
+      18px;
+  }
+
+
+  .cezooSpecialHanger{
+    height:73px;
+  }
+
+
+  .hangerString{
+    height:22px;
+  }
+
+
+  .leftString{
+    left:30%;
+  }
+
+
+  .rightString{
+    right:30%;
+  }
+
+
+  .hangerBoard{
+    top:20px;
+
+    min-height:39px;
+
+    padding:6px 3px;
+
+    border-radius:8px;
+
+    font-size:10px;
+
+    line-height:1.1;
+  }
+
+
+  .hangerHearts{
+    bottom:1px;
+
+    width:30px;
+    height:26px;
+  }
+
+
+  .hangerHeart{
+    width:6px;
+    height:6px;
+  }
+
+
+  .hangerHeart::before,
+  .hangerHeart::after{
+    width:6px;
+    height:6px;
+  }
+
+
+  .hangerHeart::before{
+    left:-3px;
+  }
+
+
+  .hangerHeart::after{
+    top:-3px;
+  }
+
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+========================================= */
+
+@media(max-width:370px){
+
+  .cezooSpecialHangers{
+    gap:4px;
+
+    padding-left:5px;
+    padding-right:5px;
+  }
+
+
+  .hangerBoard{
+    padding-left:2px;
+    padding-right:2px;
+
+    font-size:9px;
+  }
+
+}
+
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+  .cezooSpecialHanger,
+  .hangerHeart{
+    animation:none !important;
+  }
+
+}
