@@ -914,82 +914,76 @@
       ===================================== */
 
       .czRCartBar{
-        position:fixed;
+  position:fixed;
 
-        left:10px;
-        right:10px;
+  left:12px;
+  right:12px;
 
-        bottom:
-          calc(
-            10px +
-            env(safe-area-inset-bottom)
-          );
+  /* little more upward */
+  bottom:
+    calc(
+      22px +
+      env(safe-area-inset-bottom)
+    );
 
-        z-index:2147482500;
+  z-index:2147482500;
 
-        height:56px;
+  /* slightly bigger */
+  height:64px;
 
-        display:flex;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
 
-        align-items:center;
+  gap:12px;
 
-        justify-content:space-between;
+  padding:
+    9px
+    10px
+    9px
+    11px;
 
-        gap:10px;
+  border:
+    1px
+    solid
+    #e7e7e7;
 
-        padding:
-          7px
-          8px
-          7px
-          9px;
+  border-radius:18px;
 
-        border:
-          1px
-          solid
-          #e8e8e8;
+  background:#fff;
 
-        border-radius:15px;
+  box-shadow:
+    0 8px 24px
+    rgba(0,0,0,.12);
 
-        background:#fff;
+  transform:
+    translate3d(
+      0,
+      95px,
+      0
+    );
 
-        box-shadow:
-          0
-          6px
-          20px
-          rgba(0,0,0,.11);
+  opacity:0;
+  pointer-events:none;
 
-        transform:
-          translate3d(
-            0,
-            85px,
-            0
-          );
+  transition:
+    transform .22s ease,
+    opacity .18s ease;
 
-        opacity:0;
+  box-sizing:border-box;
+}
 
-        pointer-events:none;
+.czRCartBar.show{
+  transform:
+    translate3d(
+      0,
+      0,
+      0
+    );
 
-        transition:
-          transform .22s ease,
-          opacity .18s ease;
-
-        box-sizing:border-box;
-      }
-
-
-      .czRCartBar.show{
-        transform:
-          translate3d(
-            0,
-            0,
-            0
-          );
-
-        opacity:1;
-
-        pointer-events:auto;
-      }
-
+  opacity:1;
+  pointer-events:auto;
+}
 
       /* =====================================
          CART LEFT AREA
@@ -1024,34 +1018,32 @@
         min-width:38px;
       }
 
+.czRCartThumb{
+  position:relative;
 
-      .czRCartThumb{
-        position:relative;
+  width:40px;
+  height:40px;
 
-        width:36px;
-        height:36px;
+  flex:0 0 40px;
 
-        flex:0 0 36px;
+  display:block;
 
-        display:block;
+  object-fit:cover;
 
-        object-fit:cover;
+  border:2px solid #fff;
 
-        border:
-          2px
-          solid
-          #fff;
+  border-radius:10px;
 
-        border-radius:9px;
+  background:#f5f5f5;
 
-        background:#f5f5f5;
+  box-shadow:
+    0 2px 6px
+    rgba(0,0,0,.12);
+}
 
-        box-shadow:
-          0
-          1px
-          5px
-          rgba(0,0,0,.12);
-      }
+.czRCartThumb + .czRCartThumb{
+  margin-left:-9px;
+}
 
 
       .czRCartThumb + .czRCartThumb{
@@ -1294,28 +1286,37 @@
         }
 
 
-        .czRCartBar{
-          left:7px;
-          right:7px;
+       @media(max-width:600px){
 
-          height:54px;
+  .czRCartBar{
+    left:9px;
+    right:9px;
 
-          padding-left:7px;
-          padding-right:7px;
-        }
+    bottom:
+      calc(
+        20px +
+        env(safe-area-inset-bottom)
+      );
 
+    height:62px;
 
-        .czRCartThumb{
-          width:34px;
-          height:34px;
+    padding:
+      8px
+      9px;
 
-          flex-basis:34px;
-        }
+    border-radius:17px;
+  }
 
+  .czRCartThumb{
+    width:39px;
+    height:39px;
+    flex-basis:39px;
+  }
 
-        .czRCartThumb + .czRCartThumb{
-          margin-left:-9px;
-        }
+  .czRCartThumb + .czRCartThumb{
+    margin-left:-9px;
+  }
+}
 
 
         .czRCheckout{
