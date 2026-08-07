@@ -1,134 +1,81 @@
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&display=swap');
 
-
-/* =========================================
-   SPECIAL BIRTHDAY BANNER
-========================================= */
-
 .cezooBirthdayBanner{
   position:relative;
-
   width:100%;
   height:190px;
-
   display:grid;
   grid-template-columns:minmax(0,54%) minmax(0,46%);
-
   align-items:center;
-
   overflow:hidden;
-
   background:#ffd8eb;
 }
-
-
-/* =========================================
-   LEFT CONTENT
-========================================= */
 
 .cezooBirthdayContent{
   position:relative;
   z-index:6;
-
   width:100%;
-
   display:flex;
   flex-direction:column;
-
   align-items:flex-start;
   justify-content:center;
-
-  padding-left:23px;
-
+  padding-left:32px;
+  transform:translateY(-1px);
   font-family:"League Spartan",sans-serif;
 }
-
-
-/* =========================================
-   CEZOO'S
-========================================= */
 
 .cezooBirthdaySmall{
   display:block;
-
-  margin-left:35px;
-  margin-bottom:5px;
-
+  margin-left:36px;
+  margin-bottom:4px;
   font-family:"League Spartan",sans-serif;
-
   font-size:13px;
   font-weight:800;
-
   line-height:1;
-
   color:#d63d7b;
-
-  transform:rotate(-5deg);
+  transform:rotate(-6deg);
   transform-origin:left bottom;
 }
 
-
-/* =========================================
-   COMMON WORD STYLE
-========================================= */
-
 .cezooBirthdayWord{
   display:flex;
-
   align-items:flex-end;
-
   width:max-content;
-
   font-family:"League Spartan",sans-serif;
-
   font-weight:900;
-
   color:#fff;
-
   text-transform:uppercase;
-
   white-space:nowrap;
-
   text-shadow:
-    0 2px 0 rgba(206,61,120,.12),
-    0 3px 6px rgba(181,54,107,.12);
+    0 2px 0 rgba(206,61,120,.14),
+    0 4px 7px rgba(181,54,107,.16);
 }
-
 
 .cezooBirthdayWord span{
   display:inline-block;
-
   transform-origin:center bottom;
 }
 
-
-/* =========================================
-   BIRTHDAY — CURVED
-========================================= */
-
 .cezooBirthdayWordTop{
   font-size:39px;
-
-  line-height:.8;
-
+  line-height:.78;
   letter-spacing:-3px;
 }
 
-
 .cezooBirthdayWordTop span:nth-child(1){
-  transform:translateY(7px) rotate(-10deg);
+  transform:translateY(8px) rotate(-11deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(2){
-  transform:translateY(3px) rotate(-7deg);
+  transform:translateY(4px) rotate(-8deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(3){
-  transform:translateY(0) rotate(-4deg);
+  transform:translateY(1px) rotate(-5deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(4){
-  transform:translateY(-3px) rotate(-2deg);
+  transform:translateY(-2px) rotate(-2deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(5){
@@ -140,39 +87,22 @@
 }
 
 .cezooBirthdayWordTop span:nth-child(7){
-  transform:translateY(1px) rotate(7deg);
+  transform:translateY(2px) rotate(7deg);
 }
 
 .cezooBirthdayWordTop span:nth-child(8){
-  transform:translateY(6px) rotate(10deg);
+  transform:translateY(7px) rotate(11deg);
 }
-
-
-/* =========================================
-   BASH — STRAIGHT
-========================================= */
 
 .cezooBirthdayWordBottom{
   position:relative;
-
-  margin-top:11px;
-
-  /* moved left */
+  margin-top:14px;
   margin-left:18px;
-
-  padding:0;
-
-  font-size:43px;
-
-  line-height:.8;
-
+  font-size:45px;
+  line-height:.72;
   letter-spacing:-3px;
-
   transform:none;
 }
-
-
-/* keep all BASH letters straight */
 
 .cezooBirthdayWordBottom span:nth-child(1),
 .cezooBirthdayWordBottom span:nth-child(2),
@@ -181,235 +111,153 @@
   transform:none;
 }
 
-
-/* remove underline completely */
-
 .cezooBirthdayWordBottom::after{
-  display:none !important;
-  content:none !important;
+  display:none;
+  content:none;
 }
-
-
-/* =========================================
-   RIGHT IMAGE
-========================================= */
 
 .cezooBirthdayImageWrap{
   position:relative;
-
   z-index:4;
-
   width:100%;
   height:100%;
-
   min-width:0;
-
   display:flex;
   align-items:flex-end;
   justify-content:flex-end;
-
   overflow:hidden;
 }
 
-
 .cezooBirthdayImageWrap img{
   display:block;
-
   width:100%;
   height:100%;
-
   object-fit:contain;
   object-position:right bottom;
-
   user-select:none;
   pointer-events:none;
-
   -webkit-user-drag:none;
 }
 
-
-/* =========================================
-   RIBBONS
-========================================= */
-
 .cezooRibbon{
   position:absolute;
-
   z-index:2;
-
-  width:28px;
-  height:10px;
-
+  width:30px;
+  height:11px;
   border:4px solid transparent;
-
-  border-top-color:#ed78a8;
-
+  border-top-color:#ec6ca1;
   border-radius:50%;
-
   pointer-events:none;
 }
-
 
 .ribbon1{
   left:7%;
   bottom:17px;
-
   transform:rotate(18deg);
 }
 
-
 .ribbon2{
-  left:49%;
+  left:48%;
   top:28px;
-
-  width:23px;
-
-  border-top-color:#f39cbe;
-
+  width:24px;
+  border-top-color:#f8a5c7;
   transform:rotate(-28deg);
 }
-
 
 .ribbon3{
   right:7%;
   top:22px;
-
-  width:25px;
-
-  border-top-color:rgba(255,255,255,.75);
-
+  width:26px;
+  border-top-color:#ffffff;
+  opacity:.75;
   transform:rotate(33deg);
 }
 
-
-/* =========================================
-   SMALL DECORATIVE DOTS
-========================================= */
-
 .cezooBirthdayDot{
   position:absolute;
-
   z-index:2;
-
   width:5px;
   height:5px;
-
   border-radius:50%;
-
   background:#e96a9e;
-
   pointer-events:none;
 }
-
 
 .dot1{
   left:46%;
   bottom:25px;
 }
 
-
 .dot2{
   right:24%;
   top:20px;
-
   width:4px;
   height:4px;
-
   background:#fff;
 }
-
 
 .dot3{
   right:8%;
   bottom:31px;
-
   width:6px;
   height:6px;
-
   background:#f29abd;
 }
-
-
-/* =========================================
-   TABLET
-========================================= */
 
 @media(max-width:900px){
 
   .cezooBirthdayBanner{
     height:175px;
-
-    grid-template-columns:
-      minmax(0,55%)
-      minmax(0,45%);
+    grid-template-columns:minmax(0,55%) minmax(0,45%);
   }
-
 
   .cezooBirthdayContent{
-    padding-left:18px;
+    padding-left:27px;
   }
-
 
   .cezooBirthdayWordTop{
     font-size:35px;
   }
 
-
   .cezooBirthdayWordBottom{
-    margin-top:9px;
-
+    margin-top:13px;
     margin-left:16px;
-
-    font-size:39px;
+    font-size:40px;
   }
 }
-
-
-/* =========================================
-   MOBILE
-========================================= */
 
 @media(max-width:600px){
 
   .cezooBirthdayBanner{
     height:155px;
-
-    grid-template-columns:
-      minmax(0,57%)
-      minmax(0,43%);
+    grid-template-columns:minmax(0,57%) minmax(0,43%);
   }
-
 
   .cezooBirthdayContent{
-    padding-left:13px;
+    padding-left:21px;
   }
 
-
   .cezooBirthdaySmall{
-    margin-left:24px;
+    margin-left:25px;
     margin-bottom:3px;
-
     font-size:9px;
   }
 
-
   .cezooBirthdayWordTop{
     font-size:28px;
-
     letter-spacing:-2px;
   }
 
-
   .cezooBirthdayWordTop span:nth-child(1){
-    transform:translateY(5px) rotate(-9deg);
+    transform:translateY(6px) rotate(-10deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(2){
-    transform:translateY(2px) rotate(-6deg);
+    transform:translateY(3px) rotate(-7deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(3){
-    transform:translateY(0) rotate(-3deg);
+    transform:translateY(0) rotate(-4deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(4){
@@ -421,98 +269,66 @@
   }
 
   .cezooBirthdayWordTop span:nth-child(6){
-    transform:translateY(-2px) rotate(3deg);
+    transform:translateY(-2px) rotate(4deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(7){
-    transform:translateY(1px) rotate(6deg);
+    transform:translateY(1px) rotate(7deg);
   }
 
   .cezooBirthdayWordTop span:nth-child(8){
-    transform:translateY(5px) rotate(9deg);
+    transform:translateY(6px) rotate(10deg);
   }
-
-
-  /* BASH */
 
   .cezooBirthdayWordBottom{
-    margin-top:8px;
-
-    /* pushed left */
+    margin-top:12px;
     margin-left:12px;
-
-    padding:0;
-
-    font-size:32px;
-
-    line-height:.8;
-
+    font-size:33px;
     letter-spacing:-2px;
   }
-
 
   .ribbon1{
     left:5%;
     bottom:10px;
-
     transform:scale(.75) rotate(18deg);
   }
-
 
   .ribbon2{
     left:51%;
     top:17px;
-
     transform:scale(.75) rotate(-28deg);
   }
-
 
   .ribbon3{
     right:4%;
     top:14px;
-
     transform:scale(.7) rotate(33deg);
   }
 }
-
-
-/* =========================================
-   SMALL MOBILE
-========================================= */
 
 @media(max-width:370px){
 
   .cezooBirthdayBanner{
     height:142px;
-
-    grid-template-columns:
-      minmax(0,58%)
-      minmax(0,42%);
+    grid-template-columns:minmax(0,58%) minmax(0,42%);
   }
-
 
   .cezooBirthdayContent{
-    padding-left:10px;
+    padding-left:18px;
   }
-
 
   .cezooBirthdaySmall{
-    margin-left:20px;
-
+    margin-left:21px;
     font-size:8px;
   }
-
 
   .cezooBirthdayWordTop{
     font-size:24px;
   }
 
-
   .cezooBirthdayWordBottom{
-    margin-top:7px;
-
     margin-left:10px;
-
-    font-size:28px;
+    margin-top:11px;
+    font-size:29px;
   }
 }
