@@ -115,6 +115,8 @@
 
     createCartBar();
 
+    watchCezooFoodPageVisibility();
+
     bindEvents();
 
     updateCartBar();
@@ -2924,9 +2926,7 @@
         : `${totalQuantity} items`;
 
 
-    cartBar.classList.add(
-      "show"
-    );
+    syncCezooFoodCartVisibility();
 
 
     /*
@@ -3262,6 +3262,68 @@
 
   }
 
+
+  /* =========================================================
+     FOOD-ONLY CART VISIBILITY
+     Cart stays saved, but is hidden outside Food mode.
+  ========================================================= */
+
+  function isCezooFoodPageVisible() {
+    const foodPage = document.getElementById("cezooFoodPage");
+    if (!foodPage) return false;
+
+    const style = window.getComputedStyle(foodPage);
+    const ariaHidden = foodPage.getAttribute("aria-hidden");
+
+    return (
+      ariaHidden !== "true" &&
+      style.display !== "none" &&
+      style.visibility !== "hidden" &&
+      Number(style.opacity || "1") !== 0
+    );
+  }
+
+  function syncCezooFoodCartVisibility() {
+    if (!cartBar) return;
+
+    const totalQuantity = getCartItems().reduce(
+      (total, item) => total + (Number(item.qty) || 0),
+      0
+    );
+
+    cartBar.classList.toggle(
+      "show",
+      isCezooFoodPageVisible() && totalQuantity > 0
+    );
+  }
+
+  function watchCezooFoodPageVisibility() {
+    const foodPage = document.getElementById("cezooFoodPage");
+    if (!foodPage) {
+      syncCezooFoodCartVisibility();
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      requestAnimationFrame(syncCezooFoodCartVisibility);
+    });
+
+    observer.observe(foodPage, {
+      attributes: true,
+      attributeFilter: ["class", "style", "aria-hidden", "hidden"]
+    });
+
+    document.addEventListener("click", () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(syncCezooFoodCartVisibility);
+      });
+    }, { passive: true });
+
+    window.addEventListener("pageshow", syncCezooFoodCartVisibility);
+    window.addEventListener("popstate", syncCezooFoodCartVisibility);
+
+    syncCezooFoodCartVisibility();
+  }
 
   /* =========================================================
      GLOBAL HELPERS
