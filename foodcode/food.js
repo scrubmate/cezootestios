@@ -5,3 +5,11 @@ function setTanukuFoodsBannerImage(imageSrc){
 
   tanukuImage.src = imageSrc;
 }
+function setCezooBirthdayBannerImage(imageSrc){
+  const birthdayImage =
+    document.getElementById("cezooBirthdayImage");
+
+  if(!birthdayImage) return;
+
+  birthdayImage.src = imageSrc;
+}
