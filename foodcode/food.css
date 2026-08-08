@@ -719,7 +719,7 @@
   align-items:center;
   justify-content:flex-start;
 
-  /* NO GAP BETWEEN IMAGE + TEXT */
+  /* GAP BETWEEN IMAGE + TEXT */
   gap:10px;
 
   padding:
@@ -737,7 +737,7 @@
 
 
 /* =========================================================
-   LEFT IMAGE — BIGGER
+   LEFT IMAGE
 ========================================================= */
 
 .cezooPindiVantaluImage{
@@ -749,10 +749,10 @@
   display:block;
 
   object-fit:contain;
-  object-position:right center;
+  object-position:center;
 
-  /* pulls text closer */
-  margin-right:-5px;
+  margin:0;
+  padding:0;
 
   opacity:0;
 
@@ -793,14 +793,13 @@
 
   text-align:left;
 
-  /* NO EXTRA GAP */
   margin:0;
   padding:0;
 }
 
 
 /* =========================================================
-   GODAVARI VARI — BIGGER
+   GODAVARI VARI
 ========================================================= */
 
 .cezooGodavariText{
@@ -809,7 +808,7 @@
   margin:
     0
     0
-    2px
+    3px
     0;
 
   padding:0;
@@ -827,11 +826,13 @@
   line-height:1.1;
 
   letter-spacing:0;
+
+  white-space:nowrap;
 }
 
 
 /* =========================================================
-   PINDI VANTALU — BIGGER
+   PINDI VANTALU
 ========================================================= */
 
 .cezooPindiText{
@@ -878,7 +879,8 @@
   .cezooPindiVantaluTitle{
     height:112px;
 
-    gap:0;
+    /* SAME 10PX GAP */
+    gap:10px;
 
     padding:
       2px
@@ -888,29 +890,24 @@
   }
 
 
-  /* BIG IMAGE ON MOBILE */
-
   .cezooPindiVantaluImage{
     width:125px;
     height:108px;
 
-    margin-right:-5px;
+    margin:0;
 
-    object-position:right center;
+    object-fit:contain;
+    object-position:center;
   }
 
 
-  /* BIGGER TOP TEXT */
-
   .cezooGodavariText{
-    margin-bottom:2px;
+    margin-bottom:3px;
 
     font-size:15px;
     font-weight:600;
   }
 
-
-  /* BIGGER MAIN TEXT */
 
   .cezooPindiText{
     font-size:26px;
@@ -929,10 +926,13 @@
   .cezooPindiVantaluTitle{
     height:105px;
 
-    gap:0;
+    gap:10px;
 
-    padding-left:1px;
-    padding-right:5px;
+    padding:
+      2px
+      5px
+      2px
+      2px;
   }
 
 
@@ -940,7 +940,7 @@
     width:112px;
     height:101px;
 
-    margin-right:-4px;
+    margin:0;
   }
 
 
