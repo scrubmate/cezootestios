@@ -1651,84 +1651,7 @@ position:relative;
   opacity:1;
   pointer-events:auto;
 }
-.stockSignWrap{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    margin:18px 0 3px;
-}
 
-.stockSign{
-    position:relative;
-    width:95px;
-    height:30px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    background:linear-gradient(180deg,#fff6d8,#ffd98c);
-    border:1px solid #efb54a;
-    border-radius:9px;
-
-    color:#9c5600;
-    font-size:8px;
-    font-weight:800;
-    letter-spacing:.8px;
-    text-transform:uppercase;
-    white-space:nowrap;
-
-    box-shadow:
-        0 4px 10px rgba(0,0,0,.10),
-        inset 0 1px 0 rgba(255,255,255,.85);
-
-    transform-origin:top center;
-    animation:stockSwing 3s ease-in-out infinite;
-}
-
-/* Hanging Strings */
-.stockSign::before,
-.stockSign::after{
-    content:"";
-    position:absolute;
-    top:-10px;
-    width:2px;
-    height:10px;
-    background:#8d8d8d;
-}
-
-.stockSign::before{
-    left:22px;
-}
-
-.stockSign::after{
-    right:22px;
-}
-
-/* Swing Animation */
-@keyframes stockSwing{
-
-    0%{
-        transform:rotate(-3deg);
-    }
-
-    25%{
-        transform:rotate(-1deg);
-    }
-
-    50%{
-        transform:rotate(3deg);
-    }
-
-    75%{
-        transform:rotate(1deg);
-    }
-
-    100%{
-        transform:rotate(-3deg);
-    }
-
-}
 
 
 
@@ -7725,12 +7648,12 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
   </div>
 <div class="searchOffer">
     <div class="offerText">
-<div class="offerSmall">New</div>
-<div class="offerBig">Opening</div>
-<div class="offerOff">Soon</div>
+<div class="offerSmall">One Nation</div>
+<div class="offerBig">One Pride</div>
+<div class="offerOff">INDIA</div>
     </div>
 
-    <img src="update/ok.png" class="offerImage" alt="">
+    <img src="update/ind.webp" class="offerImage" alt="">
 </div>
   <div
     id="cezooSearchResults"
@@ -9538,11 +9461,7 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 </section>
 </div>
 
-<div class="stockSignWrap">
-    <div class="stockSign">
-        OUT OF STOCK
-    </div>
-</div>
+
 <h3 class="sectionTitle">2 Liters Drinks</h3>
 <div class="autoProductRow"
      data-table="cezoogroceries"
@@ -9753,11 +9672,7 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 </div>
 
 
-<div class="stockSignWrap">
-    <div class="stockSign">
-        OUT OF STOCK
-    </div>
-</div>
+
 <div class="sectionTitleWrap">
 
   <h2 class="sectionTitles">
@@ -10384,11 +10299,6 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
   </div>
 </section>
 
-<div class="stockSignWrap">
-    <div class="stockSign">
-        OUT OF STOCK
-    </div>
-</div>
 
 <section class="mallipudiSection" id="mallipudiSection">
 
@@ -19559,10 +19469,15 @@ function saveWishlist(){
 const offerTexts = [
     "Fresh Vegetables Available",
     "Ice Creams Available",
-    "Gifts Available",
-    "Grocery Store Opening Soon",
-    "Full Store Under Construction",
-    "More Categories Coming Soon"
+    "Groceries Available",
+    "Daily Essentials Available",
+    "Fresh Fruits Available",
+    "Snacks & Beverages Available",
+    "Personal Care Essentials",
+    "Household Essentials Available",
+    "Great Deals Every Day",
+    "Everything You Need, One Place",
+    "Shop More, Save More"
 ];
 let offerIndex = 0;
 
@@ -19948,5 +19863,136 @@ setInterval(() => {
 })();
 </script>
 
+
+
+<!-- =========================================================
+     iOS CEZOO LIMITED TOP PULL
+     Prevents the full page rubber-band pull in CEZOO mode.
+     Only the CEZOO top/category area moves a small distance,
+     then springs back. Food/Special and existing UI are unchanged.
+========================================================== -->
+<style id="cezooIosLimitedPullStyles">
+  html, body{
+    overscroll-behavior-y:none;
+  }
+
+  #topSection{
+    will-change:transform;
+    transform:translate3d(0,0,0);
+  }
+
+  #topSection.cezooIosPulling{
+    transition:none !important;
+  }
+
+  #topSection.cezooIosPullRelease{
+    transition:transform 320ms cubic-bezier(.22,.85,.32,1) !important;
+  }
+</style>
+
+<script id="cezooIosLimitedPullScript">
+(function(){
+  "use strict";
+
+  const topSection = document.getElementById("topSection");
+  if(!topSection) return;
+
+  /* This behavior is intended for iPhone/iPad/WKWebView only. */
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  if(!isIOS) return;
+
+  const MAX_PULL = 44;      // maximum visible pull distance
+  const RESISTANCE = 0.34; // makes the pull feel firm, not loose
+
+  let startY = 0;
+  let startX = 0;
+  let pulling = false;
+  let tracking = false;
+
+  function isCezooMode(){
+    return document.body.getAttribute("data-cezoo-mode") === "cezoo";
+  }
+
+  function isPageAtTop(){
+    return (window.scrollY || document.documentElement.scrollTop || 0) <= 0;
+  }
+
+  function shouldIgnoreTarget(target){
+    return !!target.closest(
+      "input,textarea,select,button,.sheet,#categorySheet,.productPopup,.normalPopup,.search-box,.skin-wrapper,.popupImageScroll"
+    );
+  }
+
+  function resetPull(){
+    tracking = false;
+
+    if(!pulling){
+      topSection.style.transform = "translate3d(0,0,0)";
+      return;
+    }
+
+    pulling = false;
+    topSection.classList.remove("cezooIosPulling");
+    topSection.classList.add("cezooIosPullRelease");
+    topSection.style.transform = "translate3d(0,0,0)";
+
+    window.setTimeout(function(){
+      topSection.classList.remove("cezooIosPullRelease");
+    }, 340);
+  }
+
+  document.addEventListener("touchstart", function(event){
+    if(event.touches.length !== 1) return;
+    if(!isCezooMode() || !isPageAtTop()) return;
+    if(shouldIgnoreTarget(event.target)) return;
+
+    const touch = event.touches[0];
+    startY = touch.clientY;
+    startX = touch.clientX;
+    tracking = true;
+    pulling = false;
+  }, {passive:true});
+
+  document.addEventListener("touchmove", function(event){
+    if(!tracking || event.touches.length !== 1) return;
+    if(!isCezooMode() || !isPageAtTop()){
+      resetPull();
+      return;
+    }
+
+    const touch = event.touches[0];
+    const deltaY = touch.clientY - startY;
+    const deltaX = Math.abs(touch.clientX - startX);
+
+    /* Normal upward scroll or horizontal category/product swipe stays native. */
+    if(deltaY <= 0 || deltaX > Math.abs(deltaY)){
+      if(pulling) resetPull();
+      return;
+    }
+
+    pulling = true;
+    topSection.classList.remove("cezooIosPullRelease");
+    topSection.classList.add("cezooIosPulling");
+
+    const resisted = Math.min(MAX_PULL, deltaY * RESISTANCE);
+    topSection.style.transform = `translate3d(0,${resisted}px,0)`;
+
+    /* Stop Safari/WKWebView from dragging the complete page. */
+    event.preventDefault();
+  }, {passive:false});
+
+  document.addEventListener("touchend", resetPull, {passive:true});
+  document.addEventListener("touchcancel", resetPull, {passive:true});
+
+  /* If user changes from CEZOO while a pull is active, restore immediately. */
+  document.querySelectorAll(".cezooModeBtn").forEach(function(button){
+    button.addEventListener("click", function(){
+      if(this.dataset.mode !== "cezoo") resetPull();
+    });
+  });
+})();
+</script>
 </body>
 </html>
