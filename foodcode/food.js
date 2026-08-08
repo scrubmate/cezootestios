@@ -1,17 +1,3 @@
-/* =========================================================
-   CEZOO REFRESHMENT ITEMS — CLEAN VERSION
-   Uses existing window._supabaseClient
-   No separate CSS
-
-   ✓ compact cards
-   ✓ aligned - qty +
-   ✓ small bottom sheet
-   ✓ localStorage cart
-   ✓ latest 3 product images in cart bar
-   ✓ 4th product hides oldest image
-   ✓ product image flies into cart when added
-========================================================= */
-
 (function () {
 
   "use strict";
@@ -4961,49 +4947,71 @@
 
 
       .czRestaurantTopBar{
-        position:fixed;
-        top:calc(40px + env(safe-area-inset-top));
+        position:sticky;
+
+        top:
+          calc(
+            38px +
+            env(safe-area-inset-top)
+          );
+
         left:0;
         right:0;
-        z-index:2147483304;
 
-        height:34px;
+        z-index:2147483306;
+
+        width:100%;
+        height:48px;
 
         display:flex;
         align-items:center;
 
-        padding:0 10px;
+        padding:
+          0
+          13px;
 
         background:#fff;
+
+        border-bottom:
+          1px
+          solid
+          #e5e5e5;
+
+        box-shadow:
+          0
+          2px
+          7px
+          rgba(0,0,0,.04);
 
         box-sizing:border-box;
       }
 
       .czRestaurantTopName{
+        flex:1;
         min-width:0;
 
-        margin-left:7px;
+        margin-left:8px;
 
         overflow:hidden;
 
         color:#171717;
 
-        font-size:15px;
-        font-weight:700;
-        line-height:1;
+        font-size:20px;
+        font-weight:800;
+
+        line-height:1.05;
 
         white-space:nowrap;
         text-overflow:ellipsis;
       }
 
       .czRestaurantBack{
-        flex:0 0 auto;
+        flex:0 0 36px;
 
-        width:38px;
-        height:38px;
+        width:36px;
+        height:36px;
 
         display:flex;
-
         align-items:center;
         justify-content:center;
 
@@ -5011,16 +5019,17 @@
         margin:0;
 
         border:0;
+        border-radius:0;
 
-        border-radius:50%;
+        background:transparent;
 
-        background:#fff;
-
-        color:#1f1f1f;
+        color:#171717;
 
         font-size:20px;
 
         cursor:pointer;
+
+        touch-action:manipulation;
 
         -webkit-tap-highlight-color:
           transparent;
@@ -5029,20 +5038,10 @@
       .czRestaurantBack i{
         display:block;
 
-        font-size:17px;
+        font-size:19px;
         line-height:1;
 
         pointer-events:none;
-      }
-
-
-      /*
-        If Font Awesome is delayed/not available, keep the
-        button tappable and sized correctly.
-      */
-
-      .czRestaurantBack{
-        touch-action:manipulation;
       }
 
 
@@ -6422,6 +6421,15 @@
     );
 
 
+    restaurantPage.addEventListener(
+      "touchcancel",
+      handleSwipeCancel,
+      {
+        passive:true
+      }
+    );
+
+
     window.addEventListener(
       "popstate",
       function(){
@@ -7070,11 +7078,10 @@
 
 
     /*
-      Start swipe only close to left edge.
-      This avoids blocking normal vertical scrolling.
+      Edge swipe zone is a little wider so it is easier
+      to use on iPhone / Android WebView.
     */
-
-    if(touch.clientX > 55){
+    if(touch.clientX > 82){
 
       swipeTracking =
         false;
@@ -7129,14 +7136,26 @@
       );
 
 
+    /*
+      Swipe right from the left edge.
+      Horizontal movement must be stronger than vertical movement.
+    */
     if(
-      deltaX >= 75 &&
-      deltaY <= 70
+      deltaX >= 58 &&
+      deltaX > deltaY * 1.15
     ){
 
       closeRestaurantPage();
 
     }
+
+  }
+
+
+  function handleSwipeCancel(){
+
+    swipeTracking =
+      false;
 
   }
 
