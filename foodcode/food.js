@@ -1221,59 +1221,107 @@
          FIXED CHECKOUT BUTTON
       ===================================== */
 
-      .czRCheckout{
-        flex:
-          0
-          0
-          88px;
 
-        width:88px;
-        min-width:88px;
-        max-width:88px;
-
-        height:38px;
-        min-height:38px;
-        max-height:38px;
-
+      .czRComingSoon{
+        position:relative;
+        flex:0 0 94px;
+        width:94px;
+        height:50px;
         display:flex;
+        align-items:flex-start;
+        justify-content:center;
+        padding:0;
+        margin:0;
+        border:0;
+        background:transparent;
+        user-select:none;
+        overflow:visible;
+      }
 
+      .czRComingSoonHanger{
+        position:relative;
+        width:88px;
+        height:48px;
+        transform-origin:50% 0;
+        animation:czRComingSoonSwing 2.2s ease-in-out infinite;
+      }
+
+      .czRComingSoonHanger::before,
+      .czRComingSoonHanger::after{
+        content:"";
+        position:absolute;
+        top:0;
+        width:1.5px;
+        height:13px;
+        border-radius:999px;
+        background:#6f6f6f;
+      }
+
+      .czRComingSoonHanger::before{
+        left:18px;
+        transform:rotate(8deg);
+        transform-origin:top;
+      }
+
+      .czRComingSoonHanger::after{
+        right:18px;
+        transform:rotate(-8deg);
+        transform-origin:top;
+      }
+
+      .czRComingSoonBoard{
+        position:absolute;
+        left:50%;
+        top:11px;
+        width:86px;
+        height:31px;
+        transform:translateX(-50%);
+        display:flex;
         align-items:center;
         justify-content:center;
-
-        padding:0;
-
-        margin:0;
-
-        border:0;
-
-        border-radius:10px;
-
-        background:#18a568;
-
-        color:#fff;
-
-        font-size:11px;
-        font-weight:700;
-
+        padding:0 8px;
+        border:1px solid #333;
+        border-radius:4px;
+        background:#fff;
+        color:#222;
+        font-size:9.5px;
+        font-weight:800;
         line-height:1;
-
-        cursor:pointer;
-
+        letter-spacing:.25px;
         white-space:nowrap;
-
-        box-sizing:border-box;
-
-        -webkit-tap-highlight-color:
-          transparent;
+        box-shadow:0 2px 5px rgba(0,0,0,.08);
       }
 
-
-      .czRCheckout:active{
-        transform:scale(.97);
+      .czRComingSoonBoard::before,
+      .czRComingSoonBoard::after{
+        content:"";
+        position:absolute;
+        top:-3px;
+        width:5px;
+        height:5px;
+        border-radius:50%;
+        background:#333;
       }
 
+      .czRComingSoonBoard::before{
+        left:14px;
+      }
 
-      /* =====================================
+      .czRComingSoonBoard::after{
+        right:14px;
+      }
+
+      @keyframes czRComingSoonSwing{
+        0%,100%{
+          transform:rotate(-3deg);
+        }
+
+        50%{
+          transform:rotate(3deg);
+        }
+      }
+
+/* =====================================
          FLYING PRODUCT IMAGE
       ===================================== */
 
@@ -1441,23 +1489,16 @@
     margin-left:-9px;
   }
 }
-
-
-        .czRCheckout{
-          flex-basis:82px;
-
-          width:82px;
-          min-width:82px;
-          max-width:82px;
-
-          height:36px;
-          min-height:36px;
-          max-height:36px;
-
-          font-size:10px;
+        .czRComingSoon{
+          flex-basis:88px;
+          width:88px;
         }
 
-      }
+        .czRComingSoonHanger{
+          transform-origin:50% 0;
+        }
+
+}
 
 
       @media(max-width:370px){
@@ -1560,6 +1601,10 @@
 
 
         .czRCartThumb.new-image{
+          animation:none;
+        }
+
+        .czRComingSoonHanger{
           animation:none;
         }
 
@@ -1789,15 +1834,19 @@
         </div>
 
       </div>
-
-
-      <button
-        id="czRCheckout"
-        class="czRCheckout"
-        type="button"
+      <div
+        class="czRComingSoon"
+        aria-label="Coming soon"
       >
-        Checkout
-      </button>
+        <div
+          class="czRComingSoonHanger"
+          aria-hidden="true"
+        >
+          <div class="czRComingSoonBoard">
+            Coming Soon
+          </div>
+        </div>
+      </div>
 
     `;
 
@@ -2395,46 +2444,7 @@
         "click",
         handleSheetAction
       );
-
-
-    document
-      .getElementById(
-        "czRCheckout"
-      )
-      .addEventListener(
-        "click",
-        function() {
-
-
-          const items =
-            getCartItems();
-
-
-          window.dispatchEvent(
-            new CustomEvent(
-              "cezooFoodCheckout",
-              {
-                detail:{
-                  cart:{
-                    ...cart
-                  },
-
-                  items
-                }
-              }
-            )
-          );
-
-
-          console.log(
-            "Food checkout:",
-            items
-          );
-
-        }
-      );
-
-  }
+}
 
 
   /* =========================================================
@@ -4317,9 +4327,6 @@
   let swipeStartY = 0;
   let swipeTracking = false;
 
-  let restaurantBodyOverflowBeforeOpen = "";
-  let restaurantBodyTouchActionBeforeOpen = "";
-
 
   /* =========================================================
      FRONTEND RESTAURANT IMAGE
@@ -4444,13 +4451,7 @@
 
     if(!isFoodModeActive()){
 
-      if(
-        restaurantPage?.classList.contains(
-          "show"
-        )
-      ){
-        closeRestaurantPage();
-      }
+      closeRestaurantPage();
 
       closeVariantSheet();
 
@@ -4935,17 +4936,9 @@
           transform .25s
           cubic-bezier(.22,.75,.25,1);
 
-        overscroll-behavior-y:contain;
-
-        touch-action:pan-y;
+        overscroll-behavior-y:auto;
 
         -webkit-overflow-scrolling:touch;
-
-        scrollbar-width:none;
-      }
-
-      .czRestaurantPage::-webkit-scrollbar{
-        display:none;
       }
 
       .czRestaurantPage.show{
@@ -6473,6 +6466,25 @@
     );
 
 
+    window.addEventListener(
+      "popstate",
+      function(){
+
+        if(
+          restaurantPage.classList.contains(
+            "show"
+          )
+        ){
+
+          closeRestaurantPage(
+            false
+          );
+
+        }
+
+      }
+    );
+
   }
 
 
@@ -6532,12 +6544,7 @@
     }
 
 
-    if(
-      !restaurantLoaded &&
-      !restaurantLoading
-    ){
-      showRestaurantShimmer();
-    }
+    showRestaurantShimmer();
 
 
     if(
@@ -6634,9 +6641,7 @@
       true;
 
 
-    if(!restaurantLoaded){
-      showRestaurantShimmer();
-    }
+    showRestaurantShimmer();
 
 
     try{
@@ -7027,27 +7032,27 @@
       0;
 
 
-    restaurantBodyOverflowBeforeOpen =
-      document.body.style.overflow || "";
-
-    restaurantBodyTouchActionBeforeOpen =
-      document.body.style.touchAction || "";
-
-
     document.body.style.overflow =
       "hidden";
 
-    /*
-      Keep vertical scrolling fully enabled inside the
-      restaurant page itself.
-    */
-    restaurantPage.style.touchAction =
-      "pan-y";
+
+    try{
+
+      history.pushState(
+        {
+          cezooRestaurantPage:true
+        },
+        ""
+      );
+
+    }catch{}
 
   }
 
 
-  function closeRestaurantPage(){
+  function closeRestaurantPage(
+    useHistory = true
+  ){
 
     closeVariantSheet();
 
@@ -7062,21 +7067,9 @@
     );
 
 
-    /*
-      Restore exactly the page state that existed before
-      opening the restaurant. Do not trigger browser history.
-    */
+
     document.body.style.overflow =
-      restaurantBodyOverflowBeforeOpen;
-
-    document.body.style.touchAction =
-      restaurantBodyTouchActionBeforeOpen;
-
-
-    if(restaurantPage){
-      restaurantPage.style.touchAction =
-        "pan-y";
-    }
+      "";
 
 
     if(
@@ -7088,7 +7081,20 @@
       );
     }
 
+
+    if(
+      useHistory &&
+      history.state?.cezooRestaurantPage
+    ){
+
+      try{
+        history.back();
+      }catch{}
+
+    }
+
   }
+
 
   /* =========================================================
      SWIPE RIGHT TO BACK
@@ -7097,16 +7103,6 @@
   function handleSwipeStart(
     event
   ){
-
-    if(
-      !restaurantPage?.classList.contains(
-        "show"
-      )
-    ){
-      swipeTracking = false;
-      return;
-    }
-
 
     const touch =
       event.touches?.[0];
@@ -7118,10 +7114,10 @@
 
 
     /*
-      Only start a back swipe close to the left edge.
-      Normal vertical scrolling anywhere else is untouched.
+      Edge swipe zone is a little wider so it is easier
+      to use on iPhone / Android WebView.
     */
-    if(touch.clientX > 54){
+    if(touch.clientX > 82){
 
       swipeTracking =
         false;
@@ -7177,13 +7173,12 @@
 
 
     /*
-      One internal step back only:
-      close the restaurant page.
-      No history.back(), so no loader/reload/popstate.
+      Swipe right from the left edge.
+      Horizontal movement must be stronger than vertical movement.
     */
     if(
-      deltaX >= 62 &&
-      deltaX > deltaY * 1.35
+      deltaX >= 58 &&
+      deltaX > deltaY * 1.15
     ){
 
       closeRestaurantPage();
@@ -7199,6 +7194,7 @@
       false;
 
   }
+
 
   function getRestaurantGroupQty(
     group
