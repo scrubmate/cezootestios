@@ -704,3 +704,253 @@
         height:21px;
     }
 }
+
+/* =========================================================
+   GODAVARI PINDI VANTALU HEADING
+========================================================= */
+
+.cezooPindiVantaluTitle{
+  position:relative;
+
+  width:100%;
+  height:125px;
+
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+
+  /* NO GAP BETWEEN IMAGE + TEXT */
+  gap:0;
+
+  padding:
+    3px
+    12px
+    3px
+    5px;
+
+  box-sizing:border-box;
+
+  background:transparent;
+
+  overflow:hidden;
+}
+
+
+/* =========================================================
+   LEFT IMAGE — BIGGER
+========================================================= */
+
+.cezooPindiVantaluImage{
+  flex:0 0 auto;
+
+  width:145px;
+  height:120px;
+
+  display:block;
+
+  object-fit:contain;
+  object-position:right center;
+
+  /* pulls text closer */
+  margin-right:-5px;
+
+  opacity:0;
+
+  transform:
+    translateY(4px)
+    scale(.96);
+
+  transition:
+    opacity .22s ease,
+    transform .22s ease;
+}
+
+
+/* IMAGE LOADED */
+
+.cezooPindiVantaluImage.is-loaded{
+  opacity:1;
+
+  transform:
+    translateY(0)
+    scale(1);
+}
+
+
+/* =========================================================
+   TEXT BESIDE IMAGE
+========================================================= */
+
+.cezooPindiVantaluText{
+  flex:1;
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+
+  align-items:flex-start;
+  justify-content:center;
+
+  text-align:left;
+
+  /* NO EXTRA GAP */
+  margin:0;
+  padding:0;
+}
+
+
+/* =========================================================
+   GODAVARI VARI — BIGGER
+========================================================= */
+
+.cezooGodavariText{
+  display:block;
+
+  margin:
+    0
+    0
+    2px
+    0;
+
+  padding:0;
+
+  color:#444;
+
+  font-family:
+    "Noto Sans Telugu",
+    "Nirmala UI",
+    sans-serif;
+
+  font-size:18px;
+  font-weight:600;
+
+  line-height:1.1;
+
+  letter-spacing:0;
+}
+
+
+/* =========================================================
+   PINDI VANTALU — BIGGER
+========================================================= */
+
+.cezooPindiText{
+  display:block;
+
+  margin:0;
+  padding:0;
+
+  color:#15945c;
+
+  font-family:
+    "Noto Sans Telugu",
+    "Nirmala UI",
+    sans-serif;
+
+  font-size:30px;
+  font-weight:800;
+
+  line-height:1.1;
+
+  white-space:nowrap;
+}
+
+
+/* =========================================================
+   PRODUCTS BELOW
+========================================================= */
+
+#tanukuPindiVantaluItems{
+  position:relative;
+
+  width:100%;
+
+  background:#fff;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:600px){
+
+  .cezooPindiVantaluTitle{
+    height:112px;
+
+    gap:0;
+
+    padding:
+      2px
+      7px
+      2px
+      2px;
+  }
+
+
+  /* BIG IMAGE ON MOBILE */
+
+  .cezooPindiVantaluImage{
+    width:125px;
+    height:108px;
+
+    margin-right:-5px;
+
+    object-position:right center;
+  }
+
+
+  /* BIGGER TOP TEXT */
+
+  .cezooGodavariText{
+    margin-bottom:2px;
+
+    font-size:15px;
+    font-weight:600;
+  }
+
+
+  /* BIGGER MAIN TEXT */
+
+  .cezooPindiText{
+    font-size:26px;
+    font-weight:800;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media(max-width:370px){
+
+  .cezooPindiVantaluTitle{
+    height:105px;
+
+    gap:0;
+
+    padding-left:1px;
+    padding-right:5px;
+  }
+
+
+  .cezooPindiVantaluImage{
+    width:112px;
+    height:101px;
+
+    margin-right:-4px;
+  }
+
+
+  .cezooGodavariText{
+    font-size:14px;
+  }
+
+
+  .cezooPindiText{
+    font-size:23px;
+  }
+
+}
