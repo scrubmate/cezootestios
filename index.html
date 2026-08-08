@@ -7165,6 +7165,145 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
   from{opacity:0;transform:translate3d(8px,0,0)}
   to{opacity:1;transform:translate3d(0,0,0)}
 }
+
+
+/* =========================================================
+   FOOD CLICK FULL-SCREEN LOADER
+   Isolated styles only — existing page design is untouched.
+========================================================= */
+
+#cezooFoodClickLoader{
+  position:fixed;
+  inset:0;
+  z-index:2147483647;
+  width:100%;
+  height:100dvh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:#ffffff;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  box-sizing:border-box;
+  transition:opacity .22s ease,visibility .22s ease;
+}
+
+#cezooFoodClickLoader.show{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+
+.cezooFoodClickLoaderCenter{
+  width:min(92vw,420px);
+  min-height:270px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.cezooFoodEmojiStage{
+  position:relative;
+  width:112px;
+  height:112px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.cezooFoodEmojiStage::before{
+  content:"";
+  position:absolute;
+  width:94px;
+  height:94px;
+  border-radius:50%;
+  background:radial-gradient(
+    circle,
+    rgba(255,190,110,.20) 0%,
+    rgba(255,218,170,.10) 55%,
+    transparent 74%
+  );
+  animation:cezooFoodEmojiGlow 1.45s ease-in-out infinite;
+}
+
+.cezooFoodEmoji{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:84px;
+  height:84px;
+  font-size:48px;
+  line-height:1;
+  color:#f28b30;
+  transform:translate3d(0,0,0) scale(1);
+  opacity:1;
+  will-change:transform,opacity;
+  animation:cezooFoodEmojiFloat 1.35s ease-in-out infinite;
+  transition:color .22s ease,transform .18s ease,opacity .18s ease;
+}
+
+.cezooFoodEmoji.change{
+  transform:translate3d(0,4px,0) scale(.80);
+  opacity:.18;
+}
+
+.cezooFoodClickLoaderText{
+  margin-top:15px;
+  color:#242424;
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px;
+  font-weight:800;
+  line-height:1.25;
+  letter-spacing:-.15px;
+  animation:cezooFoodClickText 1.25s ease-in-out infinite;
+}
+
+@keyframes cezooFoodEmojiFloat{
+  0%,100%{
+    transform:translate3d(0,1px,0) rotate(-2deg) scale(.96);
+  }
+  50%{
+    transform:translate3d(0,-7px,0) rotate(2deg) scale(1.04);
+  }
+}
+
+@keyframes cezooFoodEmojiGlow{
+  0%,100%{
+    transform:scale(.90);
+    opacity:.55;
+  }
+  50%{
+    transform:scale(1.08);
+    opacity:1;
+  }
+}
+
+@keyframes cezooFoodClickText{
+  0%,100%{
+    transform:translate3d(0,0,0);
+    opacity:.68;
+  }
+  50%{
+    transform:translate3d(0,-3px,0);
+    opacity:1;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .cezooFoodEmojiStage::before,
+  .cezooFoodEmoji,
+  .cezooFoodClickLoaderText{
+    animation:none !important;
+  }
+}
+
+
 </style>
 </head>
 
@@ -7937,6 +8076,7 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 
 </div>
 <section id="cezooSpecialCakeItems"></section>
+
 </section>
 
 <div id="contentArea">
@@ -19457,6 +19597,140 @@ setInterval(() => {
   const specialPage = document.getElementById("cezooSpecialPage");
   const sittingImage = document.querySelector(".cezooSittingImage");
 
+  let foodClickLoader = null;
+  let foodClickEmojiTimer = null;
+  let foodClickCloseTimer = null;
+  let foodClickEmojiIndex = 0;
+
+  function stopFoodClickLoaderTimers(){
+    if(foodClickEmojiTimer){
+      clearInterval(foodClickEmojiTimer);
+      foodClickEmojiTimer = null;
+    }
+
+    if(foodClickCloseTimer){
+      clearTimeout(foodClickCloseTimer);
+      foodClickCloseTimer = null;
+    }
+  }
+
+  function ensureFoodClickLoader(){
+    if(foodClickLoader && foodClickLoader.isConnected){
+      return foodClickLoader;
+    }
+
+    foodClickLoader = document.createElement("div");
+    foodClickLoader.id = "cezooFoodClickLoader";
+    foodClickLoader.setAttribute("aria-live","polite");
+    foodClickLoader.setAttribute("aria-label","Loading Food");
+
+    foodClickLoader.innerHTML = `
+      <div class="cezooFoodClickLoaderCenter">
+        <div class="cezooFoodEmojiStage" aria-hidden="true">
+          <div class="cezooFoodEmoji" id="cezooFoodClickEmoji"><i class="fa-solid fa-drumstick-bite"></i></div>
+        </div>
+
+        <div class="cezooFoodClickLoaderText">
+          Getting your food ready
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(foodClickLoader);
+
+    return foodClickLoader;
+  }
+
+  function showFoodClickLoader(){
+    stopFoodClickLoaderTimers();
+
+    const loader = ensureFoodClickLoader();
+    const emoji = loader.querySelector("#cezooFoodClickEmoji");
+
+    const foods = [
+      { icon:"fa-drumstick-bite", color:"#e8792e" },
+      { icon:"fa-pizza-slice", color:"#ef9b2d" },
+      { icon:"fa-burger", color:"#c97832" },
+      { icon:"fa-bowl-food", color:"#e06443" },
+      { icon:"fa-utensils", color:"#555555" },
+      { icon:"fa-cookie-bite", color:"#b87943" }
+    ];
+
+    foodClickEmojiIndex = 0;
+
+    if(emoji){
+      emoji.innerHTML =
+        `<i class="fa-solid ${foods[0].icon}"></i>`;
+
+      emoji.style.color =
+        foods[0].color;
+    }
+
+    requestAnimationFrame(function(){
+      loader.classList.add("show");
+    });
+
+    foodClickEmojiTimer = setInterval(function(){
+      if(!emoji) return;
+
+      emoji.classList.add("change");
+
+      setTimeout(function(){
+        foodClickEmojiIndex =
+          (foodClickEmojiIndex + 1) %
+          foods.length;
+
+        const foodVisual =
+          foods[foodClickEmojiIndex];
+
+        emoji.innerHTML =
+          `<i class="fa-solid ${foodVisual.icon}"></i>`;
+
+        emoji.style.color =
+          foodVisual.color;
+
+        emoji.classList.remove("change");
+      },110);
+
+    },620);
+  }
+
+  function hideFoodClickLoader(){
+    stopFoodClickLoaderTimers();
+
+    if(!foodClickLoader){
+      return;
+    }
+
+    const oldLoader = foodClickLoader;
+
+    oldLoader.classList.remove("show");
+
+    foodClickLoader = null;
+
+    setTimeout(function(){
+      if(oldLoader && oldLoader.isConnected){
+        oldLoader.remove();
+      }
+    },260);
+  }
+
+  function runFoodClickLoader(){
+    showFoodClickLoader();
+
+    /*
+      Food mode is already switched underneath the overlay,
+      so its existing Food JS can begin loading immediately.
+      This overlay is only a short visual transition.
+    */
+    foodClickCloseTimer = setTimeout(
+      hideFoodClickLoader,
+      1450
+    );
+  }
+
+
+
   let cezooCategoryColor =
     (topSection && getComputedStyle(topSection).backgroundColor) ||
     "rgb(255, 159, 207)";
@@ -19548,8 +19822,16 @@ setInterval(() => {
   buttons.forEach((button) => {
     button.addEventListener("click", function(){
       const nextMode = this.dataset.mode;
+
       playModeCracker(this, nextMode);
+
       setMode(nextMode);
+
+      if(nextMode === "food"){
+        runFoodClickLoader();
+      }else{
+        hideFoodClickLoader();
+      }
     });
   });
 
