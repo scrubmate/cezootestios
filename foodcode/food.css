@@ -720,7 +720,7 @@
   justify-content:flex-start;
 
   /* NO GAP BETWEEN IMAGE + TEXT */
-  gap:0;
+  gap:10px;
 
   padding:
     3px
