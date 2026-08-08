@@ -1510,7 +1510,7 @@
       #cezooFoodPage{
         padding-bottom:
           calc(
-            100px +
+            150px +
             env(safe-area-inset-bottom)
           ) !important;
 
@@ -1525,7 +1525,7 @@
         width:100%;
         height:
           calc(
-            40px +
+            70px +
             env(safe-area-inset-bottom)
           );
 
@@ -1540,7 +1540,7 @@
         #cezooFoodPage{
           padding-bottom:
             calc(
-              40px +
+              90px +
               env(safe-area-inset-bottom)
             ) !important;
         }
@@ -5318,8 +5318,8 @@
       .czRestaurantFoodAdd{
         flex:0 0 auto;
 
-        width:54px;
-        height:29px;
+        width:72px;
+        height:36px;
 
         display:flex;
 
@@ -5327,24 +5327,29 @@
         justify-content:center;
 
         padding:0;
+        margin:0;
 
         border:
           1px
           solid
           #d6d6d6;
 
-        border-radius:8px;
+        border-radius:10px;
 
         background:#fff;
 
         color:#15945c;
 
-        font-size:10px;
+        font-size:11px;
         font-weight:800;
+
+        line-height:1;
 
         box-shadow:none;
 
         cursor:pointer;
+
+        box-sizing:border-box;
       }
 
 
@@ -5467,28 +5472,31 @@
       .czRestaurantFoodQty{
         flex:0 0 auto;
 
-        height:31px;
+        width:72px;
+        height:36px;
 
         display:grid;
 
         grid-template-columns:
-          25px
-          22px
-          25px;
+          24px
+          24px
+          24px;
 
         align-items:center;
         justify-items:center;
 
         overflow:hidden;
 
-        border-radius:8px;
+        border-radius:10px;
 
         background:#15945c;
+
+        box-sizing:border-box;
       }
 
       .czRestaurantFoodQty button{
-        width:25px;
-        height:31px;
+        width:24px;
+        height:36px;
 
         display:flex;
 
@@ -5504,22 +5512,42 @@
 
         color:#fff;
 
+        font-family:
+          Arial,
+          sans-serif;
+
         font-size:16px;
+        font-weight:500;
 
         line-height:1;
 
         cursor:pointer;
+
+        box-sizing:border-box;
       }
 
       .czRestaurantFoodQty span{
-        width:22px;
+        width:24px;
+        height:36px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        padding:0;
+        margin:0;
 
         color:#fff;
 
-        font-size:10px;
+        font-size:11px;
         font-weight:800;
 
+        line-height:1;
+
         text-align:center;
+
+        box-sizing:border-box;
       }
 
 
