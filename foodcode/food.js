@@ -4997,41 +4997,33 @@
       }
 
       .czRestaurantBack{
-        position:relative;
+        flex:0 0 auto;
 
-        top:auto;
-        left:auto;
-
-        z-index:1;
-
-        flex:0 0 28px;
-
-        width:28px;
-        height:30px;
+        width:38px;
+        height:38px;
 
         display:flex;
+
         align-items:center;
-        justify-content:flex-start;
+        justify-content:center;
 
         padding:0;
         margin:0;
 
         border:0;
-        border-radius:0;
 
-        background:transparent;
+        border-radius:50%;
 
-        color:#111;
+        background:#fff;
 
-        font-size:18px;
+        color:#1f1f1f;
 
-        line-height:1;
-
-        box-shadow:none;
+        font-size:20px;
 
         cursor:pointer;
 
-        -webkit-tap-highlight-color:transparent;
+        -webkit-tap-highlight-color:
+          transparent;
       }
 
       .czRestaurantBack i{
