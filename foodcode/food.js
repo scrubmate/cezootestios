@@ -4317,6 +4317,9 @@
   let swipeStartY = 0;
   let swipeTracking = false;
 
+  let restaurantBodyOverflowBeforeOpen = "";
+  let restaurantBodyTouchActionBeforeOpen = "";
+
 
   /* =========================================================
      FRONTEND RESTAURANT IMAGE
@@ -4441,7 +4444,13 @@
 
     if(!isFoodModeActive()){
 
-      closeRestaurantPage();
+      if(
+        restaurantPage?.classList.contains(
+          "show"
+        )
+      ){
+        closeRestaurantPage();
+      }
 
       closeVariantSheet();
 
@@ -4577,7 +4586,7 @@
 
         top:
           calc(
-            75px +
+            94px +
             env(safe-area-inset-top)
           );
 
@@ -4681,7 +4690,7 @@
 
         top:
           calc(
-            101px +
+            124px +
             env(safe-area-inset-top)
           );
 
@@ -4926,9 +4935,17 @@
           transform .25s
           cubic-bezier(.22,.75,.25,1);
 
-        overscroll-behavior-y:auto;
+        overscroll-behavior-y:contain;
+
+        touch-action:pan-y;
 
         -webkit-overflow-scrolling:touch;
+
+        scrollbar-width:none;
+      }
+
+      .czRestaurantPage::-webkit-scrollbar{
+        display:none;
       }
 
       .czRestaurantPage.show{
@@ -4984,6 +5001,32 @@
           rgba(0,0,0,.04);
 
         box-sizing:border-box;
+      }
+
+      /*
+        Fill the whole area above the sticky navbar in white.
+        This removes the transparent/visible-content gap at the top
+        without changing the navbar to position:fixed.
+      */
+      .czRestaurantTopBar::before{
+        content:"";
+
+        position:absolute;
+
+        left:0;
+        right:0;
+
+        bottom:100%;
+
+        height:
+          calc(
+            38px +
+            env(safe-area-inset-top)
+          );
+
+        background:#fff;
+
+        pointer-events:none;
       }
 
       .czRestaurantTopName{
@@ -5134,7 +5177,7 @@
 
         padding:
           calc(
-            190px +
+            218px +
             env(safe-area-inset-top)
           )
           16px
@@ -6074,7 +6117,7 @@
 
           padding:
             calc(
-              186px +
+              214px +
               env(safe-area-inset-top)
             )
             14px
@@ -6430,25 +6473,6 @@
     );
 
 
-    window.addEventListener(
-      "popstate",
-      function(){
-
-        if(
-          restaurantPage.classList.contains(
-            "show"
-          )
-        ){
-
-          closeRestaurantPage(
-            false
-          );
-
-        }
-
-      }
-    );
-
   }
 
 
@@ -6508,7 +6532,12 @@
     }
 
 
-    showRestaurantShimmer();
+    if(
+      !restaurantLoaded &&
+      !restaurantLoading
+    ){
+      showRestaurantShimmer();
+    }
 
 
     if(
@@ -6605,7 +6634,9 @@
       true;
 
 
-    showRestaurantShimmer();
+    if(!restaurantLoaded){
+      showRestaurantShimmer();
+    }
 
 
     try{
@@ -6996,27 +7027,27 @@
       0;
 
 
+    restaurantBodyOverflowBeforeOpen =
+      document.body.style.overflow || "";
+
+    restaurantBodyTouchActionBeforeOpen =
+      document.body.style.touchAction || "";
+
+
     document.body.style.overflow =
       "hidden";
 
-
-    try{
-
-      history.pushState(
-        {
-          cezooRestaurantPage:true
-        },
-        ""
-      );
-
-    }catch{}
+    /*
+      Keep vertical scrolling fully enabled inside the
+      restaurant page itself.
+    */
+    restaurantPage.style.touchAction =
+      "pan-y";
 
   }
 
 
-  function closeRestaurantPage(
-    useHistory = true
-  ){
+  function closeRestaurantPage(){
 
     closeVariantSheet();
 
@@ -7031,9 +7062,21 @@
     );
 
 
-
+    /*
+      Restore exactly the page state that existed before
+      opening the restaurant. Do not trigger browser history.
+    */
     document.body.style.overflow =
-      "";
+      restaurantBodyOverflowBeforeOpen;
+
+    document.body.style.touchAction =
+      restaurantBodyTouchActionBeforeOpen;
+
+
+    if(restaurantPage){
+      restaurantPage.style.touchAction =
+        "pan-y";
+    }
 
 
     if(
@@ -7045,20 +7088,7 @@
       );
     }
 
-
-    if(
-      useHistory &&
-      history.state?.cezooRestaurantPage
-    ){
-
-      try{
-        history.back();
-      }catch{}
-
-    }
-
   }
-
 
   /* =========================================================
      SWIPE RIGHT TO BACK
@@ -7067,6 +7097,16 @@
   function handleSwipeStart(
     event
   ){
+
+    if(
+      !restaurantPage?.classList.contains(
+        "show"
+      )
+    ){
+      swipeTracking = false;
+      return;
+    }
+
 
     const touch =
       event.touches?.[0];
@@ -7078,10 +7118,10 @@
 
 
     /*
-      Edge swipe zone is a little wider so it is easier
-      to use on iPhone / Android WebView.
+      Only start a back swipe close to the left edge.
+      Normal vertical scrolling anywhere else is untouched.
     */
-    if(touch.clientX > 82){
+    if(touch.clientX > 54){
 
       swipeTracking =
         false;
@@ -7137,12 +7177,13 @@
 
 
     /*
-      Swipe right from the left edge.
-      Horizontal movement must be stronger than vertical movement.
+      One internal step back only:
+      close the restaurant page.
+      No history.back(), so no loader/reload/popstate.
     */
     if(
-      deltaX >= 58 &&
-      deltaX > deltaY * 1.15
+      deltaX >= 62 &&
+      deltaX > deltaY * 1.35
     ){
 
       closeRestaurantPage();
@@ -7158,7 +7199,6 @@
       false;
 
   }
-
 
   function getRestaurantGroupQty(
     group
