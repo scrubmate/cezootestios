@@ -1540,7 +1540,7 @@
         #cezooFoodPage{
           padding-bottom:
             calc(
-              40px +
+              90px +
               env(safe-area-inset-bottom)
             ) !important;
         }
