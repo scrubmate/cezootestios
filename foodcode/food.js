@@ -226,6 +226,29 @@
           : {};
 
 
+      /* Remove stale / zero / broken cart rows */
+      Object.keys(cart).forEach(
+        function(key){
+
+          const qty =
+            Number(
+              cart[key]?.qty
+            ) || 0;
+
+          if(qty <= 0){
+            delete cart[key];
+          }
+
+        }
+      );
+
+
+      localStorage.setItem(
+        CART_KEY,
+        JSON.stringify(cart)
+      );
+
+
     } catch (error) {
 
       console.warn(
@@ -245,6 +268,22 @@
   ========================================================= */
 
   function saveCart() {
+
+    Object.keys(cart).forEach(
+      function(key){
+
+        const qty =
+          Number(
+            cart[key]?.qty
+          ) || 0;
+
+        if(qty <= 0){
+          delete cart[key];
+        }
+
+      }
+    );
+
 
     localStorage.setItem(
       CART_KEY,
@@ -617,7 +656,7 @@
 
 
       .czRQuantity{
-        margin-top:4px;
+        margin-top:2px;
 
         color:#8a8a8a;
 
@@ -849,7 +888,7 @@
 
         gap:6px;
 
-        margin-top:7px;
+        margin-top:4px;
       }
 
 
@@ -3136,11 +3175,42 @@
       totalQuantity <= 0
     ) {
 
-
       cartBar.classList.remove(
         "show"
       );
 
+      cartBar.style.zIndex =
+        "";
+
+      const imageContainer =
+        document.getElementById(
+          "czRCartImages"
+        );
+
+      if(imageContainer){
+        imageContainer.innerHTML =
+          "";
+      }
+
+      const title =
+        document.getElementById(
+          "czRCartTitle"
+        );
+
+      if(title){
+        title.textContent =
+          "Food Cart";
+      }
+
+      const sub =
+        document.getElementById(
+          "czRCartSub"
+        );
+
+      if(sub){
+        sub.textContent =
+          "";
+      }
 
       return;
 
@@ -3263,9 +3333,7 @@
         : `${totalQuantity} items`;
 
 
-    cartBar.classList.add(
-      "show"
-    );
+    syncCezooFoodCartVisibility();
 
 
     /*
@@ -3645,21 +3713,108 @@
       return;
     }
 
+
+    const items =
+      getCartItems();
+
+
     const totalQuantity =
-      getCartItems().reduce(
-        (total, item) =>
-          total + (Number(item.qty) || 0),
+      items.reduce(
+        function(total, item){
+
+          return total +
+            (
+              Number(
+                item.qty
+              ) || 0
+            );
+
+        },
         0
       );
 
+
+    const restaurantPage =
+      document.getElementById(
+        "czRestaurantPage"
+      );
+
+
+    const restaurantPageOpen =
+      Boolean(
+        restaurantPage &&
+        restaurantPage.classList.contains(
+          "show"
+        )
+      );
+
+
+    const shouldShow =
+      totalQuantity > 0 &&
+      isFoodModeActive() &&
+      (
+        isCezooFoodPageVisible() ||
+        restaurantPageOpen
+      );
+
+
     cartBar.classList.toggle(
       "show",
-      isCezooFoodPageVisible() &&
-      totalQuantity > 0
+      shouldShow
     );
 
-  }
 
+    /*
+      Restaurant full page sits above the Food page.
+      Lift cart only while that full page is actually open.
+    */
+    cartBar.style.zIndex =
+      shouldShow &&
+      restaurantPageOpen
+
+        ? "2147483350"
+
+        : "";
+
+
+    if(!shouldShow && totalQuantity <= 0){
+
+      const images =
+        document.getElementById(
+          "czRCartImages"
+        );
+
+
+      if(images){
+        images.innerHTML = "";
+      }
+
+
+      const title =
+        document.getElementById(
+          "czRCartTitle"
+        );
+
+
+      if(title){
+        title.textContent =
+          "Food Cart";
+      }
+
+
+      const sub =
+        document.getElementById(
+          "czRCartSub"
+        );
+
+
+      if(sub){
+        sub.textContent = "";
+      }
+
+    }
+
+  }
 
   function watchCezooFoodPageVisibility() {
 
@@ -3832,6 +3987,25 @@
     };
 
 
+  window.addEventListener(
+    "storage",
+    function(event){
+
+      if(
+        event.key ===
+        "cezooFoodCart"
+      ){
+
+        loadCart();
+
+        updateCartBar();
+
+      }
+
+    }
+  );
+
+
   window.reloadCezooFoodItems =
     async function() {
 
@@ -3839,6 +4013,42 @@
       foodProductsLoading = false;
 
       await checkAndLoadFoodMode();
+
+    };
+
+
+  /* =========================================================
+     RESTAURANT FOOD CART BRIDGE
+     Allows restaurant variants to use this SAME Food cart.
+  ========================================================= */
+
+  window.setCezooFoodCartProductQty =
+    function(product, qty) {
+
+      if (!product || product.id == null) {
+        return;
+      }
+
+      setQty(
+        product,
+        qty
+      );
+
+    };
+
+
+  window.getCezooFoodCartProductQty =
+    function(id) {
+
+      return getQty(id);
+
+    };
+
+
+  window.syncCezooFoodCartBar =
+    function(){
+
+      syncCezooFoodCartVisibility();
 
     };
 
@@ -3984,6 +4194,3875 @@
     initPindiVantaluImage();
 
   }
+
+
+})();
+
+/* =========================================================
+   CEZOO — RESTAURANT EXPLORE FULL PAGE
+
+   REQUIRED HTML:
+   <section id="tanukuFoodsExploreItems"></section>
+
+   FLOW:
+   1) Main FOOD page shows RESTAURANT CARD only.
+   2) Tap restaurant card -> full-page restaurant sheet.
+   3) Back button is 40px from top.
+   4) Swipe right from left edge -> back.
+   5) Restaurant page shows 2 food cards per row.
+   6) Half / Full / Regular stay grouped as ONE food card.
+   7) ADD on multi-variant item opens compact variant bottom sheet.
+   8) Same cezooFoodCart + same Food cart bar.
+   9) Supabase realtime stays live.
+   10) Restaurant image can be set from frontend:
+       setCezooRestaurantImage("your-image.png");
+========================================================= */
+
+(function () {
+
+  "use strict";
+
+  const RESTAURANT_TABLE =
+    "restaurant_food_items";
+
+  const RESTAURANT_SECTION_ID =
+    "tanukuFoodsExploreItems";
+
+  let restaurantSection = null;
+
+  let restaurantRows = [];
+  let restaurantGroups = [];
+
+  let restaurantLoaded = false;
+  let restaurantLoading = false;
+
+  let currentRestaurantName = "";
+  let frontendRestaurantImage = "";
+
+  let pageOverlay = null;
+  let restaurantPage = null;
+
+  let variantOverlay = null;
+  let variantSheet = null;
+
+  let selectedGroupKey = "";
+
+  let realtimeChannel = null;
+  let modeObserver = null;
+
+  let swipeStartX = 0;
+  let swipeStartY = 0;
+  let swipeTracking = false;
+
+
+  /* =========================================================
+     FRONTEND RESTAURANT IMAGE
+  ========================================================= */
+
+  window.setCezooRestaurantImage =
+    function(imageSrc){
+
+      frontendRestaurantImage =
+        String(imageSrc || "").trim();
+
+      renderRestaurantEntryCard();
+
+      const pageImage =
+        document.getElementById(
+          "czRestaurantPageImage"
+        );
+
+      if(pageImage){
+
+        if(frontendRestaurantImage){
+          pageImage.src =
+            frontendRestaurantImage;
+
+          pageImage.style.display =
+            "block";
+        }else{
+          pageImage.removeAttribute(
+            "src"
+          );
+
+          pageImage.style.display =
+            "none";
+        }
+
+      }
+
+    };
+
+
+  /* =========================================================
+     START
+  ========================================================= */
+
+  if(
+    document.readyState ===
+    "loading"
+  ){
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      initRestaurantExplore,
+      {
+        once:true
+      }
+    );
+
+  }else{
+
+    initRestaurantExplore();
+
+  }
+
+
+  /* =========================================================
+     INIT
+  ========================================================= */
+
+  function initRestaurantExplore(){
+
+    restaurantSection =
+      document.getElementById(
+        RESTAURANT_SECTION_ID
+      );
+
+    if(!restaurantSection){
+      return;
+    }
+
+    if(
+      restaurantSection.dataset
+        .restaurantFullReady === "1"
+    ){
+      checkRestaurantMode();
+      return;
+    }
+
+    restaurantSection.dataset
+      .restaurantFullReady = "1";
+
+    injectRestaurantCSS();
+
+    createRestaurantPage();
+
+    createVariantSheet();
+
+    bindRestaurantEvents();
+
+    watchRestaurantMode();
+
+    checkRestaurantMode();
+
+  }
+
+
+  /* =========================================================
+     FOOD MODE
+  ========================================================= */
+
+  function isFoodModeActive(){
+
+    return (
+      document.body.getAttribute(
+        "data-cezoo-mode"
+      ) === "food"
+    );
+
+  }
+
+
+  async function checkRestaurantMode(){
+
+    if(!isFoodModeActive()){
+
+      closeRestaurantPage();
+
+      closeVariantSheet();
+
+      return;
+    }
+
+    if(
+      restaurantLoaded ||
+      restaurantLoading
+    ){
+      return;
+    }
+
+    await loadRestaurantData();
+
+  }
+
+
+  /* =========================================================
+     CSS
+  ========================================================= */
+
+  function injectRestaurantCSS(){
+
+    if(
+      document.getElementById(
+        "czRestaurantFullPageStyles"
+      )
+    ){
+      return;
+    }
+
+    const style =
+      document.createElement(
+        "style"
+      );
+
+    style.id =
+      "czRestaurantFullPageStyles";
+
+    style.textContent = `
+
+      /* =====================================
+         MAIN RESTAURANT ENTRY
+      ===================================== */
+
+      #tanukuFoodsExploreItems{
+        width:100%;
+        padding:4px 10px 14px;
+        box-sizing:border-box;
+        background:#fff;
+
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      .czRestaurantEntry{
+        width:100%;
+
+        display:flex;
+        align-items:center;
+
+        gap:12px;
+
+        padding:8px 0;
+
+        background:transparent;
+
+        border:0;
+
+        cursor:pointer;
+
+        -webkit-tap-highlight-color:
+          transparent;
+      }
+
+      .czRestaurantEntry:active{
+        transform:scale(.995);
+      }
+
+      .czRestaurantEntryImageBox{
+        flex:0 0 auto;
+
+        width:94px;
+        height:76px;
+
+        overflow:hidden;
+
+        border-radius:13px;
+
+        background:#f4f4f4;
+      }
+
+      .czRestaurantEntryImage{
+        width:100%;
+        height:100%;
+
+        display:block;
+
+        object-fit:cover;
+        object-position:center;
+      }
+
+      .czRestaurantEntryNoImage{
+        width:100%;
+        height:100%;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        color:#aaa;
+
+        font-size:9px;
+      }
+
+      .czRestaurantEntryText{
+        flex:1;
+        min-width:0;
+
+        text-align:left;
+      }
+
+      .czRestaurantEntrySmall{
+        color:#15945c;
+
+        font-size:9px;
+        font-weight:750;
+
+        text-transform:uppercase;
+
+        letter-spacing:.3px;
+      }
+
+      .czRestaurantEntryName{
+        margin-top:4px;
+
+        color:#202020;
+
+        font-size:18px;
+        font-weight:800;
+
+        line-height:1.15;
+      }
+
+      .czRestaurantEntrySub{
+        margin-top:4px;
+
+        color:#8a8a8a;
+
+        font-size:10px;
+
+        line-height:1.3;
+      }
+
+      .czRestaurantEntryArrow{
+        flex:0 0 auto;
+
+        width:30px;
+        height:30px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        color:#333;
+
+        font-size:21px;
+        font-weight:400;
+      }
+
+
+      /* =====================================
+         FULL PAGE OVERLAY
+      ===================================== */
+
+      .czRestaurantPageOverlay{
+        position:fixed;
+
+        inset:0;
+
+        z-index:2147483300;
+
+        background:#fff;
+
+        opacity:0;
+
+        visibility:hidden;
+
+        pointer-events:none;
+
+        transition:
+          opacity .18s ease,
+          visibility .18s ease;
+      }
+
+      .czRestaurantPageOverlay.show{
+        opacity:1;
+        visibility:visible;
+        pointer-events:auto;
+      }
+
+
+      /* =====================================
+         FULL RESTAURANT PAGE
+      ===================================== */
+
+      .czRestaurantPage{
+        position:fixed;
+
+        inset:0;
+
+        z-index:2147483301;
+
+        width:100%;
+        height:100dvh;
+
+        overflow-y:auto;
+        overflow-x:hidden;
+
+        background:#fff;
+
+        transform:
+          translate3d(
+            100%,
+            0,
+            0
+          );
+
+        transition:
+          transform .25s
+          cubic-bezier(.22,.75,.25,1);
+
+        overscroll-behavior:contain;
+
+        -webkit-overflow-scrolling:touch;
+      }
+
+      .czRestaurantPage.show{
+        transform:
+          translate3d(
+            0,
+            0,
+            0
+          );
+      }
+
+
+      /* =====================================
+         BACK BUTTON — TOP 40PX
+      ===================================== */
+
+
+      .czRestaurantTopBar{
+        position:fixed;
+        top:calc(40px + env(safe-area-inset-top));
+        left:0;
+        right:0;
+        z-index:2147483304;
+
+        height:34px;
+
+        display:flex;
+        align-items:center;
+
+        padding:0 10px;
+
+        background:#fff;
+
+        box-sizing:border-box;
+      }
+
+      .czRestaurantTopName{
+        min-width:0;
+
+        margin-left:7px;
+
+        overflow:hidden;
+
+        color:#171717;
+
+        font-size:15px;
+        font-weight:700;
+        line-height:1;
+
+        white-space:nowrap;
+        text-overflow:ellipsis;
+      }
+
+      .czRestaurantBack{
+        position:relative;
+
+        top:auto;
+        left:auto;
+
+        z-index:1;
+
+        flex:0 0 28px;
+
+        width:28px;
+        height:30px;
+
+        display:flex;
+        align-items:center;
+        justify-content:flex-start;
+
+        padding:0;
+        margin:0;
+
+        border:0;
+        border-radius:0;
+
+        background:transparent;
+
+        color:#111;
+
+        font-size:18px;
+
+        line-height:1;
+
+        box-shadow:none;
+
+        cursor:pointer;
+
+        -webkit-tap-highlight-color:transparent;
+      }
+
+      .czRestaurantBack i{
+        display:block;
+
+        font-size:17px;
+        line-height:1;
+
+        pointer-events:none;
+      }
+
+
+      /*
+        If Font Awesome is delayed/not available, keep the
+        button tappable and sized correctly.
+      */
+
+      .czRestaurantBack{
+        touch-action:manipulation;
+      }
+
+
+      /* =====================================
+         RESTAURANT HERO
+      ===================================== */
+
+      .czRestaurantHero{
+        display:none;
+      }
+
+      .czRestaurantPageImage{
+        width:100%;
+        height:100%;
+
+        display:block;
+
+        object-fit:cover;
+        object-position:center;
+      }
+
+      .czRestaurantHeroFade{
+        position:absolute;
+
+        left:0;
+        right:0;
+        bottom:0;
+
+        height:70px;
+
+        background:
+          linear-gradient(
+            to bottom,
+            rgba(255,255,255,0),
+            #fff
+          );
+
+        pointer-events:none;
+      }
+
+
+      /* =====================================
+         PAGE TITLE
+      ===================================== */
+
+      .czRestaurantPageHead{
+        display:none;
+      }
+
+      .czRestaurantPageName{
+        margin:0;
+
+        color:#1f1f1f;
+
+        font-size:22px;
+        font-weight:800;
+
+        line-height:1.15;
+      }
+
+      .czRestaurantPageSub{
+        margin-top:2px;
+
+        color:#888;
+
+        font-size:10px;
+
+        line-height:1.3;
+      }
+
+
+      /* =====================================
+         2 FOOD CARDS PER ROW
+      ===================================== */
+
+      .czRestaurantFoodsGrid{
+        width:100%;
+
+        display:grid;
+
+        grid-template-columns:
+          repeat(
+            2,
+            minmax(0,1fr)
+          );
+
+        gap:
+          11px
+          10px;
+
+        padding:
+          calc(
+            76px +
+            env(safe-area-inset-top)
+          )
+          14px
+          calc(
+            100px +
+            env(safe-area-inset-bottom)
+          );
+
+        box-sizing:border-box;
+      }
+
+
+      /* =====================================
+         FOOD CARD — NO BIG BOX LOOK
+      ===================================== */
+
+      .czRestaurantFoodCard{
+        min-width:0;
+
+        background:#fff;
+
+        border:
+          1px
+          solid
+          #ececec;
+
+        border-radius:12px;
+
+        overflow:hidden;
+
+        box-shadow:
+          0
+          1px
+          4px
+          rgba(0,0,0,.035);
+
+        cursor:pointer;
+
+        -webkit-tap-highlight-color:
+          transparent;
+      }
+
+      .czRestaurantFoodImageBox{
+        position:relative;
+
+        width:100%;
+
+        aspect-ratio:
+          1.24 / 1;
+
+        overflow:hidden;
+
+        border-radius:
+          11px
+          11px
+          0
+          0;
+
+        background:#f5f5f5;
+      }
+
+      .czRestaurantFoodImage{
+        width:100%;
+        height:100%;
+
+        display:block;
+
+        object-fit:cover;
+        object-position:center;
+      }
+
+      .czRestaurantFoodNoImage{
+        width:100%;
+        height:100%;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        color:#aaa;
+
+        font-size:9px;
+      }
+
+      .czRestaurantFoodInfo{
+        padding:
+          6px
+          7px
+          7px;
+      }
+
+      .czRestaurantFoodName{
+        min-height:0;
+
+        margin:0;
+        padding:0;
+
+        display:-webkit-box;
+
+        overflow:hidden;
+
+        -webkit-box-orient:vertical;
+        -webkit-line-clamp:2;
+
+        color:#2a2a2a;
+
+        font-size:12px;
+        font-weight:750;
+
+        line-height:1.14;
+      }
+
+      .czRestaurantFoodDesc{
+        display:none;
+      }
+
+      .czRestaurantFoodBottom{
+        display:flex;
+
+        align-items:center;
+        justify-content:space-between;
+
+        gap:5px;
+
+        margin-top:3px;
+      }
+
+      .czRestaurantFoodFrom{
+        display:block;
+
+        margin-bottom:1px;
+
+        color:#999;
+
+        font-size:7px;
+        font-weight:600;
+      }
+
+      .czRestaurantFoodPrices{
+        display:flex;
+
+        align-items:center;
+
+        gap:4px;
+      }
+
+      .czRestaurantFoodMrp{
+        color:#999;
+
+        font-size:9px;
+
+        text-decoration:
+          line-through;
+      }
+
+      .czRestaurantFoodPrice{
+        color:#222;
+
+        font-size:13px;
+        font-weight:800;
+      }
+
+
+      /* =====================================
+         ADD
+      ===================================== */
+
+      .czRestaurantFoodAdd{
+        flex:0 0 auto;
+
+        width:58px;
+        height:31px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        padding:0;
+
+        border:
+          1px
+          solid
+          #d6d6d6;
+
+        border-radius:8px;
+
+        background:#fff;
+
+        color:#15945c;
+
+        font-size:10px;
+        font-weight:800;
+
+        box-shadow:none;
+
+        cursor:pointer;
+      }
+
+
+      /* =====================================
+         COMING SOON MINI HANGER
+      ===================================== */
+
+      .czRestaurantSoon{
+        position:relative;
+
+        flex:0 0 auto;
+
+        width:61px;
+        height:34px;
+
+        display:flex;
+
+        align-items:flex-end;
+        justify-content:center;
+      }
+
+      .czRestaurantSoonHook{
+        position:absolute;
+
+        top:0;
+        left:50%;
+
+        width:14px;
+        height:7px;
+
+        transform:
+          translateX(-50%);
+
+        border:
+          1px
+          solid
+          #15945c;
+
+        border-bottom:0;
+
+        border-radius:
+          8px
+          8px
+          0
+          0;
+
+        box-sizing:border-box;
+      }
+
+      .czRestaurantSoon::before,
+      .czRestaurantSoon::after{
+        content:"";
+
+        position:absolute;
+
+        top:6px;
+
+        width:1px;
+        height:8px;
+
+        background:#15945c;
+      }
+
+      .czRestaurantSoon::before{
+        left:20px;
+
+        transform:rotate(8deg);
+      }
+
+      .czRestaurantSoon::after{
+        right:20px;
+
+        transform:rotate(-8deg);
+      }
+
+      .czRestaurantSoonBoard{
+        width:59px;
+        height:23px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        padding:
+          0
+          4px;
+
+        box-sizing:border-box;
+
+        border:
+          1px
+          solid
+          #15945c;
+
+        border-radius:7px;
+
+        background:#fff;
+
+        color:#15945c;
+
+        font-size:6.5px;
+        font-weight:800;
+
+        white-space:nowrap;
+
+        box-shadow:
+          0
+          2px
+          5px
+          rgba(0,0,0,.05);
+      }
+
+
+      /* =====================================
+         VARIANT OVERLAY
+      ===================================== */
+
+
+      .czRestaurantFoodQty{
+        flex:0 0 auto;
+
+        height:31px;
+
+        display:grid;
+
+        grid-template-columns:
+          25px
+          22px
+          25px;
+
+        align-items:center;
+        justify-items:center;
+
+        overflow:hidden;
+
+        border-radius:8px;
+
+        background:#15945c;
+      }
+
+      .czRestaurantFoodQty button{
+        width:25px;
+        height:31px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        padding:0;
+        margin:0;
+
+        border:0;
+
+        background:transparent;
+
+        color:#fff;
+
+        font-size:16px;
+
+        line-height:1;
+
+        cursor:pointer;
+      }
+
+      .czRestaurantFoodQty span{
+        width:22px;
+
+        color:#fff;
+
+        font-size:10px;
+        font-weight:800;
+
+        text-align:center;
+      }
+
+      .czRestaurantVariantOverlay{
+        position:fixed;
+
+        inset:0;
+
+        z-index:2147483400;
+
+        background:
+          rgba(0,0,0,.28);
+
+        opacity:0;
+
+        visibility:hidden;
+
+        pointer-events:none;
+
+        transition:
+          opacity .18s ease,
+          visibility .18s ease;
+      }
+
+      .czRestaurantVariantOverlay.show{
+        opacity:1;
+
+        visibility:visible;
+
+        pointer-events:auto;
+      }
+
+
+      /* =====================================
+         VARIANT BOTTOM SHEET
+      ===================================== */
+
+      .czRestaurantVariantSheet{
+        position:fixed;
+
+        left:50%;
+        bottom:0;
+
+        z-index:2147483401;
+
+        width:
+          min(
+            calc(100% - 8px),
+            540px
+          );
+
+        max-height:72vh;
+
+        overflow-y:auto;
+
+        padding:
+          8px
+          13px
+          calc(
+            17px +
+            env(safe-area-inset-bottom)
+          );
+
+        box-sizing:border-box;
+
+        background:#fff;
+
+        border-radius:
+          20px
+          20px
+          0
+          0;
+
+        transform:
+          translate3d(
+            -50%,
+            105%,
+            0
+          );
+
+        transition:
+          transform .22s ease;
+
+        box-shadow:
+          0
+          -8px
+          25px
+          rgba(0,0,0,.14);
+      }
+
+      .czRestaurantVariantSheet.show{
+        transform:
+          translate3d(
+            -50%,
+            0,
+            0
+          );
+      }
+
+      .czRestaurantVariantHandle{
+        width:34px;
+        height:4px;
+
+        margin:
+          0
+          auto
+          8px;
+
+        border-radius:999px;
+
+        background:#d8d8d8;
+      }
+
+      .czRestaurantVariantClose{
+        position:absolute;
+
+        top:12px;
+        right:12px;
+
+        width:31px;
+        height:31px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        padding:0;
+
+        border:0;
+
+        border-radius:50%;
+
+        background:#f3f3f3;
+
+        color:#222;
+
+        font-size:18px;
+
+        cursor:pointer;
+      }
+
+      .czRestaurantVariantImageBox{
+        width:
+          calc(100% + 26px);
+
+        height:180px;
+
+        margin-left:-13px;
+        margin-right:-13px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        overflow:hidden;
+
+        background:#f6f6f6;
+      }
+
+      .czRestaurantVariantImage{
+        width:100%;
+        height:100%;
+
+        display:block;
+
+        object-fit:contain;
+        object-position:center;
+      }
+
+      .czRestaurantVariantContent{
+        padding-top:12px;
+      }
+
+      .czRestaurantVariantTitle{
+        margin:
+          0
+          38px
+          0
+          0;
+
+        color:#202020;
+
+        font-size:18px;
+        font-weight:750;
+
+        line-height:1.2;
+      }
+
+      .czRestaurantVariantDesc{
+        margin-top:5px;
+
+        color:#777;
+
+        font-size:10px;
+
+        line-height:1.4;
+      }
+
+      .czRestaurantVariantList{
+        display:flex;
+
+        flex-direction:column;
+
+        gap:8px;
+
+        margin-top:12px;
+      }
+
+      .czRestaurantVariantRow{
+        min-height:56px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:space-between;
+
+        gap:10px;
+
+        padding:
+          8px
+          9px
+          8px
+          10px;
+
+        border:
+          1px
+          solid
+          #ededed;
+
+        border-radius:11px;
+
+        background:#fff;
+
+        box-sizing:border-box;
+      }
+
+      .czRestaurantVariantLeft{
+        flex:1;
+        min-width:0;
+      }
+
+      .czRestaurantVariantName{
+        color:#222;
+
+        font-size:12px;
+        font-weight:700;
+      }
+
+      .czRestaurantVariantPrices{
+        display:flex;
+
+        align-items:center;
+
+        gap:5px;
+
+        margin-top:4px;
+      }
+
+      .czRestaurantVariantMrp{
+        color:#999;
+
+        font-size:9px;
+
+        text-decoration:
+          line-through;
+      }
+
+      .czRestaurantVariantPrice{
+        color:#111;
+
+        font-size:13px;
+        font-weight:750;
+      }
+
+      .czRestaurantVariantAdd{
+        flex:0 0 auto;
+
+        width:63px;
+        height:33px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        padding:0;
+
+        border:
+          1px
+          solid
+          #d4d4d4;
+
+        border-radius:9px;
+
+        background:#fff;
+
+        color:#15945c;
+
+        font-size:10px;
+        font-weight:800;
+
+        cursor:pointer;
+      }
+
+      .czRestaurantVariantQty{
+        flex:0 0 auto;
+
+        height:33px;
+
+        display:grid;
+
+        grid-template-columns:
+          28px
+          23px
+          28px;
+
+        align-items:center;
+        justify-items:center;
+
+        overflow:hidden;
+
+        border-radius:9px;
+
+        background:#15945c;
+      }
+
+      .czRestaurantVariantQty button{
+        width:28px;
+        height:33px;
+
+        display:flex;
+
+        align-items:center;
+        justify-content:center;
+
+        padding:0;
+        margin:0;
+
+        border:0;
+
+        background:transparent;
+
+        color:#fff;
+
+        font-family:Arial,sans-serif;
+
+        font-size:17px;
+
+        cursor:pointer;
+      }
+
+      .czRestaurantVariantQty span{
+        color:#fff;
+
+        font-size:11px;
+        font-weight:700;
+      }
+
+
+      /* =====================================
+         MESSAGE
+      ===================================== */
+
+      .czRestaurantMessage{
+        width:100%;
+
+        padding:22px 10px;
+
+        box-sizing:border-box;
+
+        text-align:center;
+
+        color:#888;
+
+        font-size:10px;
+      }
+
+
+      /* =====================================
+         MOBILE
+      ===================================== */
+
+      @media(max-width:600px){
+
+        .czRestaurantHero{
+          display:none;
+        }
+
+        .czRestaurantPageName{
+          font-size:20px;
+        }
+
+        .czRestaurantFoodsGrid{
+          gap:
+            10px
+            9px;
+
+          padding:
+            calc(
+              76px +
+              env(safe-area-inset-top)
+            )
+            12px
+            calc(
+              98px +
+              env(safe-area-inset-bottom)
+            );
+        }
+
+        .czRestaurantFoodName{
+          font-size:11px;
+        }
+
+      }
+
+
+      @media(max-width:370px){
+
+        .czRestaurantFoodsGrid{
+          gap:
+            11px
+            7px;
+
+          padding-left:6px;
+          padding-right:6px;
+        }
+
+        .czRestaurantFoodName{
+          font-size:10px;
+        }
+
+      }
+
+
+      @media(
+        prefers-reduced-motion:
+        reduce
+      ){
+
+        .czRestaurantPage,
+        .czRestaurantPageOverlay,
+        .czRestaurantVariantSheet,
+        .czRestaurantVariantOverlay{
+          transition:none;
+        }
+
+      }
+
+    `;
+
+    document.head.appendChild(
+      style
+    );
+
+  }
+
+
+  /* =========================================================
+     CREATE FULL PAGE
+  ========================================================= */
+
+  function createRestaurantPage(){
+
+    pageOverlay =
+      document.getElementById(
+        "czRestaurantPageOverlay"
+      );
+
+    if(!pageOverlay){
+
+      pageOverlay =
+        document.createElement(
+          "div"
+        );
+
+      pageOverlay.id =
+        "czRestaurantPageOverlay";
+
+      pageOverlay.className =
+        "czRestaurantPageOverlay";
+
+      document.body.appendChild(
+        pageOverlay
+      );
+
+    }
+
+
+    restaurantPage =
+      document.getElementById(
+        "czRestaurantPage"
+      );
+
+    if(!restaurantPage){
+
+      restaurantPage =
+        document.createElement(
+          "div"
+        );
+
+      restaurantPage.id =
+        "czRestaurantPage";
+
+      restaurantPage.className =
+        "czRestaurantPage";
+
+      restaurantPage.innerHTML = `
+
+        <div class="czRestaurantTopBar">
+          <button
+            id="czRestaurantBack"
+            class="czRestaurantBack"
+            type="button"
+            aria-label="Back"
+          >
+            <i
+              class="fas fa-arrow-left"
+              aria-hidden="true"
+            ></i>
+          </button>
+
+          <div
+            class="czRestaurantTopName"
+            id="czRestaurantTopName"
+          ></div>
+        </div>
+
+        <div class="czRestaurantHero">
+
+          <img
+            id="czRestaurantPageImage"
+            class="czRestaurantPageImage"
+            alt=""
+            style="display:none"
+          >
+
+          <div
+            class="czRestaurantHeroFade"
+          ></div>
+
+        </div>
+
+        <div
+          class="czRestaurantPageHead"
+        >
+
+          <h2
+            id="czRestaurantPageName"
+            class="czRestaurantPageName"
+          ></h2>
+
+          <div
+            class="czRestaurantPageSub"
+          >
+            Fresh food prepared for you
+          </div>
+
+        </div>
+
+        <div
+          id="czRestaurantFoodsGrid"
+          class="czRestaurantFoodsGrid"
+        ></div>
+
+      `;
+
+      document.body.appendChild(
+        restaurantPage
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     CREATE VARIANT SHEET
+  ========================================================= */
+
+  function createVariantSheet(){
+
+    variantOverlay =
+      document.getElementById(
+        "czRestaurantVariantOverlay"
+      );
+
+    if(!variantOverlay){
+
+      variantOverlay =
+        document.createElement(
+          "div"
+        );
+
+      variantOverlay.id =
+        "czRestaurantVariantOverlay";
+
+      variantOverlay.className =
+        "czRestaurantVariantOverlay";
+
+      document.body.appendChild(
+        variantOverlay
+      );
+
+    }
+
+
+    variantSheet =
+      document.getElementById(
+        "czRestaurantVariantSheet"
+      );
+
+    if(!variantSheet){
+
+      variantSheet =
+        document.createElement(
+          "div"
+        );
+
+      variantSheet.id =
+        "czRestaurantVariantSheet";
+
+      variantSheet.className =
+        "czRestaurantVariantSheet";
+
+      variantSheet.innerHTML = `
+
+        <div
+          class="czRestaurantVariantHandle"
+        ></div>
+
+        <button
+          type="button"
+          id="czRestaurantVariantClose"
+          class="czRestaurantVariantClose"
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+        <div
+          id="czRestaurantVariantInner"
+        ></div>
+
+      `;
+
+      document.body.appendChild(
+        variantSheet
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     EVENTS
+  ========================================================= */
+
+  function bindRestaurantEvents(){
+
+    restaurantSection.addEventListener(
+      "click",
+      handleRestaurantEntryClick
+    );
+
+
+    document
+      .getElementById(
+        "czRestaurantBack"
+      )
+      ?.addEventListener(
+        "click",
+        closeRestaurantPage
+      );
+
+
+    restaurantPage.addEventListener(
+      "click",
+      handleRestaurantPageClick
+    );
+
+
+    variantOverlay.addEventListener(
+      "click",
+      closeVariantSheet
+    );
+
+
+    document
+      .getElementById(
+        "czRestaurantVariantClose"
+      )
+      ?.addEventListener(
+        "click",
+        closeVariantSheet
+      );
+
+
+    variantSheet.addEventListener(
+      "click",
+      handleVariantSheetClick
+    );
+
+
+    restaurantPage.addEventListener(
+      "touchstart",
+      handleSwipeStart,
+      {
+        passive:true
+      }
+    );
+
+
+    restaurantPage.addEventListener(
+      "touchend",
+      handleSwipeEnd,
+      {
+        passive:true
+      }
+    );
+
+
+    window.addEventListener(
+      "popstate",
+      function(){
+
+        if(
+          restaurantPage.classList.contains(
+            "show"
+          )
+        ){
+
+          closeRestaurantPage(
+            false
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     LOAD RESTAURANT DATA
+  ========================================================= */
+
+  async function loadRestaurantData(){
+
+    if(
+      !restaurantSection ||
+      !isFoodModeActive()
+    ){
+      return;
+    }
+
+
+    if(!window._supabaseClient){
+
+      restaurantSection.innerHTML = `
+        <div class="czRestaurantMessage">
+          Unable to load restaurant
+        </div>
+      `;
+
+      return;
+    }
+
+
+    if(restaurantLoading){
+      return;
+    }
+
+
+    restaurantLoading =
+      true;
+
+
+    try{
+
+      const {
+        data,
+        error
+      } =
+        await window._supabaseClient
+          .from(
+            RESTAURANT_TABLE
+          )
+          .select(`
+            id,
+            restaurant_name,
+            product_name,
+            item_name,
+            short_description,
+            original_price,
+            discount_price,
+            image1,
+            is_open,
+            created_at
+          `)
+          .order(
+            "id",
+            {
+              ascending:true
+            }
+          );
+
+
+      if(error){
+        throw error;
+      }
+
+
+      restaurantRows =
+        Array.isArray(data)
+          ? data
+          : [];
+
+
+      restaurantGroups =
+        groupRestaurantItems(
+          restaurantRows
+        );
+
+
+      currentRestaurantName =
+        restaurantRows[0]
+          ?.restaurant_name ||
+        "Restaurant";
+
+
+      restaurantLoaded =
+        true;
+
+
+      renderRestaurantEntryCard();
+
+
+      if(
+        restaurantPage.classList.contains(
+          "show"
+        )
+      ){
+
+        renderRestaurantFullPage();
+
+      }
+
+
+      startRealtime();
+
+
+    }catch(error){
+
+      console.error(
+        "Restaurant food load error:",
+        error
+      );
+
+
+      restaurantSection.innerHTML = `
+        <div class="czRestaurantMessage">
+          Unable to load restaurant
+        </div>
+      `;
+
+
+    }finally{
+
+      restaurantLoading =
+        false;
+
+    }
+
+  }
+
+
+  /* =========================================================
+     GROUP VARIANTS
+  ========================================================= */
+
+  function groupRestaurantItems(rows){
+
+    const map =
+      new Map();
+
+
+    rows.forEach(
+      function(row){
+
+        const restaurant =
+          String(
+            row.restaurant_name ||
+            ""
+          ).trim();
+
+
+        const cleanName =
+          cleanMainProductName(
+            row.product_name
+          );
+
+
+        if(!cleanName){
+          return;
+        }
+
+
+        const key =
+          `${restaurant.toLowerCase()}__${cleanName.toLowerCase()}`;
+
+
+        if(!map.has(key)){
+
+          map.set(
+            key,
+            {
+              key:key,
+
+              restaurant_name:
+                restaurant,
+
+              product_name:
+                cleanName,
+
+              short_description:
+                cleanMainDescription(
+                  row.short_description,
+                  cleanName
+                ),
+
+              image1:
+                row.image1 ||
+                "",
+
+              variants:[]
+            }
+          );
+
+        }
+
+
+        const group =
+          map.get(key);
+
+
+        if(
+          !group.image1 &&
+          row.image1
+        ){
+          group.image1 =
+            row.image1;
+        }
+
+
+        if(
+          !group.short_description &&
+          row.short_description
+        ){
+          group.short_description =
+            cleanMainDescription(
+              row.short_description,
+              cleanName
+            );
+        }
+
+
+        group.variants.push(
+          row
+        );
+
+      }
+    );
+
+
+    return Array.from(
+      map.values()
+    );
+
+  }
+
+
+  /* =========================================================
+     MAIN RESTAURANT CARD
+  ========================================================= */
+
+  function renderRestaurantEntryCard(){
+
+    if(!restaurantSection){
+      return;
+    }
+
+
+    if(!restaurantRows.length){
+
+      restaurantSection.innerHTML = `
+        <div class="czRestaurantMessage">
+          No restaurant available
+        </div>
+      `;
+
+      return;
+    }
+
+
+    const image =
+      frontendRestaurantImage;
+
+
+    restaurantSection.innerHTML = `
+
+      <button
+        type="button"
+        class="czRestaurantEntry"
+        id="czRestaurantEntry"
+      >
+
+        <div
+          class="czRestaurantEntryImageBox"
+        >
+
+          ${
+            image
+              ? `
+                <img
+                  class="czRestaurantEntryImage"
+                  src="${escapeRestaurantHTML(image)}"
+                  alt="${escapeRestaurantHTML(currentRestaurantName)}"
+                >
+              `
+              : `
+                <div class="czRestaurantEntryNoImage">
+                  Restaurant Image
+                </div>
+              `
+          }
+
+        </div>
+
+
+        <div
+          class="czRestaurantEntryText"
+        >
+
+          <div
+            class="czRestaurantEntrySmall"
+          >
+            Restaurant
+          </div>
+
+          <div
+            class="czRestaurantEntryName"
+          >
+            ${escapeRestaurantHTML(currentRestaurantName)}
+          </div>
+
+          <div
+            class="czRestaurantEntrySub"
+          >
+            Tap to explore the full menu
+          </div>
+
+        </div>
+
+
+        <div
+          class="czRestaurantEntryArrow"
+        >
+          ›
+        </div>
+
+      </button>
+
+    `;
+
+  }
+
+
+  function handleRestaurantEntryClick(
+    event
+  ){
+
+    if(
+      !event.target.closest(
+        "#czRestaurantEntry"
+      )
+    ){
+      return;
+    }
+
+
+    openRestaurantPage();
+
+  }
+
+
+  /* =========================================================
+     OPEN FULL PAGE
+  ========================================================= */
+
+  function openRestaurantPage(){
+
+    renderRestaurantFullPage();
+
+
+    pageOverlay.classList.add(
+      "show"
+    );
+
+
+    restaurantPage.classList.add(
+      "show"
+    );
+
+
+    if(
+      typeof window.syncCezooFoodCartBar ===
+      "function"
+    ){
+      window.syncCezooFoodCartBar();
+    }
+
+
+    requestAnimationFrame(syncRestaurantTopName);
+
+
+    restaurantPage.scrollTop =
+      0;
+
+
+    document.body.style.overflow =
+      "hidden";
+
+
+    try{
+
+      history.pushState(
+        {
+          cezooRestaurantPage:true
+        },
+        ""
+      );
+
+    }catch{}
+
+  }
+
+
+  function closeRestaurantPage(
+    useHistory = true
+  ){
+
+    closeVariantSheet();
+
+
+    pageOverlay?.classList.remove(
+      "show"
+    );
+
+
+    restaurantPage?.classList.remove(
+      "show"
+    );
+
+
+
+    document.body.style.overflow =
+      "";
+
+
+    if(
+      typeof window.syncCezooFoodCartBar ===
+      "function"
+    ){
+      requestAnimationFrame(
+        window.syncCezooFoodCartBar
+      );
+    }
+
+
+    if(
+      useHistory &&
+      history.state?.cezooRestaurantPage
+    ){
+
+      try{
+        history.back();
+      }catch{}
+
+    }
+
+  }
+
+
+  /* =========================================================
+     SWIPE RIGHT TO BACK
+  ========================================================= */
+
+  function handleSwipeStart(
+    event
+  ){
+
+    const touch =
+      event.touches?.[0];
+
+
+    if(!touch){
+      return;
+    }
+
+
+    /*
+      Start swipe only close to left edge.
+      This avoids blocking normal vertical scrolling.
+    */
+
+    if(touch.clientX > 55){
+
+      swipeTracking =
+        false;
+
+      return;
+    }
+
+
+    swipeTracking =
+      true;
+
+    swipeStartX =
+      touch.clientX;
+
+    swipeStartY =
+      touch.clientY;
+
+  }
+
+
+  function handleSwipeEnd(
+    event
+  ){
+
+    if(!swipeTracking){
+      return;
+    }
+
+
+    swipeTracking =
+      false;
+
+
+    const touch =
+      event.changedTouches?.[0];
+
+
+    if(!touch){
+      return;
+    }
+
+
+    const deltaX =
+      touch.clientX -
+      swipeStartX;
+
+
+    const deltaY =
+      Math.abs(
+        touch.clientY -
+        swipeStartY
+      );
+
+
+    if(
+      deltaX >= 75 &&
+      deltaY <= 70
+    ){
+
+      closeRestaurantPage();
+
+    }
+
+  }
+
+
+  function getRestaurantGroupQty(
+    group
+  ){
+
+    if(!group?.variants?.length){
+      return 0;
+    }
+
+
+    return group.variants.reduce(
+      function(total, variant){
+
+        return total +
+          getRestaurantCartQty(
+            restaurantVariantCartId(
+              variant
+            )
+          );
+
+      },
+      0
+    );
+
+  }
+
+
+  function restaurantMainActionHTML(
+    group,
+    allClosed
+  ){
+
+    if(allClosed){
+      return comingSoonHTML();
+    }
+
+
+    const qty =
+      getRestaurantGroupQty(
+        group
+      );
+
+
+    if(qty <= 0){
+
+      return `
+        <button
+          type="button"
+          class="czRestaurantFoodAdd"
+          data-rest-food-open="${escapeRestaurantHTML(group.key)}"
+        >
+          ADD
+        </button>
+      `;
+
+    }
+
+
+    return `
+      <div
+        class="czRestaurantFoodQty"
+        data-rest-food-qty="${escapeRestaurantHTML(group.key)}"
+      >
+        <button
+          type="button"
+          data-rest-food-minus="${escapeRestaurantHTML(group.key)}"
+          aria-label="Decrease"
+        >
+          −
+        </button>
+
+        <span>${qty}</span>
+
+        <button
+          type="button"
+          data-rest-food-plus="${escapeRestaurantHTML(group.key)}"
+          aria-label="Increase"
+        >
+          +
+        </button>
+      </div>
+    `;
+
+  }
+
+
+  /* =========================================================
+     FULL PAGE RENDER
+  ========================================================= */
+
+  function renderRestaurantFullPage(){
+
+    document.getElementById(
+      "czRestaurantPageName"
+    ).textContent =
+      currentRestaurantName;
+
+
+    const topRestaurantName =
+      document.getElementById(
+        "czRestaurantTopName"
+      );
+
+
+    if(topRestaurantName){
+
+      topRestaurantName.textContent =
+        currentRestaurantName ||
+        "Restaurant";
+
+    }
+
+
+    const pageImage =
+      document.getElementById(
+        "czRestaurantPageImage"
+      );
+
+
+    if(frontendRestaurantImage){
+
+      pageImage.src =
+        frontendRestaurantImage;
+
+      pageImage.style.display =
+        "block";
+
+    }else{
+
+      pageImage.removeAttribute(
+        "src"
+      );
+
+      pageImage.style.display =
+        "none";
+
+    }
+
+
+    const grid =
+      document.getElementById(
+        "czRestaurantFoodsGrid"
+      );
+
+
+    if(!restaurantGroups.length){
+
+      grid.innerHTML = `
+        <div
+          class="czRestaurantMessage"
+          style="grid-column:1/-1"
+        >
+          No foods available
+        </div>
+      `;
+
+      return;
+    }
+
+
+    grid.innerHTML =
+      restaurantGroups
+        .map(
+          function(group){
+
+            const openVariants =
+              group.variants.filter(
+                variant =>
+                  isRestaurantVariantOpen(variant)
+              );
+
+
+            const allClosed =
+              openVariants.length === 0;
+
+
+            const usableVariants =
+              openVariants.length
+                ? openVariants
+                : group.variants;
+
+
+            const cheapest =
+              usableVariants
+                .slice()
+                .sort(
+                  (
+                    a,
+                    b
+                  ) =>
+                    getRestaurantPrice(a) -
+                    getRestaurantPrice(b)
+                )[0];
+
+
+            const mrp =
+              Number(
+                cheapest?.original_price
+              ) || 0;
+
+
+            const price =
+              getRestaurantPrice(
+                cheapest || {}
+              );
+
+
+            return `
+
+              <article
+                class="czRestaurantFoodCard"
+                data-rest-food-card="${escapeRestaurantHTML(group.key)}"
+              >
+
+                <div
+                  class="czRestaurantFoodImageBox"
+                >
+
+                  ${
+                    group.image1
+                      ? `
+                        <img
+                          class="czRestaurantFoodImage"
+                          src="${escapeRestaurantHTML(group.image1)}"
+                          alt="${escapeRestaurantHTML(group.product_name)}"
+                          loading="lazy"
+                          decoding="async"
+                        >
+                      `
+                      : `
+                        <div class="czRestaurantFoodNoImage">
+                          No Image
+                        </div>
+                      `
+                  }
+
+                </div>
+
+
+                <div
+                  class="czRestaurantFoodInfo"
+                >
+
+                  <div
+                    class="czRestaurantFoodName"
+                  >
+                    ${escapeRestaurantHTML(group.product_name)}
+                  </div>
+
+
+                  ${
+                    group.short_description
+                      ? `
+                        <div
+                          class="czRestaurantFoodDesc"
+                        >
+                          ${escapeRestaurantHTML(group.short_description)}
+                        </div>
+                      `
+                      : ""
+                  }
+
+
+                  <div
+                    class="czRestaurantFoodBottom"
+                  >
+
+                    <div>
+
+                      ${
+                        group.variants.length > 1
+                          ? `
+                            <span
+                              class="czRestaurantFoodFrom"
+                            >
+                              From
+                            </span>
+                          `
+                          : ""
+                      }
+
+
+                      <div
+                        class="czRestaurantFoodPrices"
+                      >
+
+                        ${
+                          mrp > price
+                            ? `
+                              <span
+                                class="czRestaurantFoodMrp"
+                              >
+                                ₹${restaurantMoney(mrp)}
+                              </span>
+                            `
+                            : ""
+                        }
+
+
+                        <span
+                          class="czRestaurantFoodPrice"
+                        >
+                          ₹${restaurantMoney(price)}
+                        </span>
+
+                      </div>
+
+                    </div>
+
+
+                    ${
+                      restaurantMainActionHTML(
+                        group,
+                        allClosed
+                      )
+                    }
+
+                  </div>
+
+                </div>
+
+              </article>
+
+            `;
+
+          }
+        )
+        .join("");
+
+  }
+
+
+  /* =========================================================
+     PAGE CARD CLICK
+  ========================================================= */
+
+  function handleRestaurantPageClick(
+    event
+  ){
+
+    const minusButton =
+      event.target.closest(
+        "[data-rest-food-minus]"
+      );
+
+
+    if(minusButton){
+
+      event.preventDefault();
+      event.stopPropagation();
+
+
+      const group =
+        findRestaurantGroup(
+          minusButton.dataset.restFoodMinus
+        );
+
+
+      if(!group){
+        return;
+      }
+
+
+      /*
+        Single variant = change directly.
+        Multiple variants = open chooser so user can select
+        which Half / Full quantity to reduce.
+      */
+
+      if(group.variants.length === 1){
+
+        const variant =
+          group.variants[0];
+
+
+        const qty =
+          getRestaurantCartQty(
+            restaurantVariantCartId(
+              variant
+            )
+          );
+
+
+        setRestaurantVariantQty(
+          variant,
+          qty - 1
+        );
+
+      }else{
+
+        openVariantSheet(
+          group
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    const plusButton =
+      event.target.closest(
+        "[data-rest-food-plus]"
+      );
+
+
+    if(plusButton){
+
+      event.preventDefault();
+      event.stopPropagation();
+
+
+      const group =
+        findRestaurantGroup(
+          plusButton.dataset.restFoodPlus
+        );
+
+
+      if(!group){
+        return;
+      }
+
+
+      if(group.variants.length === 1){
+
+        const variant =
+          group.variants[0];
+
+
+        if(
+          isRestaurantVariantOpen(
+            variant
+          )
+        ){
+
+          const qty =
+            getRestaurantCartQty(
+              restaurantVariantCartId(
+                variant
+              )
+            );
+
+
+          setRestaurantVariantQty(
+            variant,
+            qty + 1
+          );
+
+        }
+
+      }else{
+
+        openVariantSheet(
+          group
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    const addButton =
+      event.target.closest(
+        "[data-rest-food-open]"
+      );
+
+
+    if(addButton){
+
+      event.preventDefault();
+      event.stopPropagation();
+
+    }
+
+
+    const target =
+      addButton ||
+      event.target.closest(
+        "[data-rest-food-card]"
+      );
+
+
+    if(!target){
+      return;
+    }
+
+
+    const key =
+      target.dataset.restFoodOpen ||
+      target.dataset.restFoodCard;
+
+
+    const group =
+      findRestaurantGroup(
+        key
+      );
+
+
+    if(!group){
+      return;
+    }
+
+
+    if(
+      group.variants.length === 1
+    ){
+
+      const variant =
+        group.variants[0];
+
+
+      if(
+        isRestaurantVariantOpen(
+          variant
+        )
+      ){
+
+        const qty =
+          getRestaurantCartQty(
+            restaurantVariantCartId(
+              variant
+            )
+          );
+
+
+        setRestaurantVariantQty(
+          variant,
+          qty > 0
+            ? qty + 1
+            : 1
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    openVariantSheet(
+      group
+    );
+
+  }
+
+
+  /* =========================================================
+     VARIANT SHEET
+  ========================================================= */
+
+  function openVariantSheet(
+    group
+  ){
+
+    selectedGroupKey =
+      group.key;
+
+
+    renderVariantSheet(
+      group
+    );
+
+
+    variantOverlay.classList.add(
+      "show"
+    );
+
+
+    variantSheet.classList.add(
+      "show"
+    );
+
+  }
+
+
+  function closeVariantSheet(){
+
+    variantOverlay?.classList.remove(
+      "show"
+    );
+
+
+    variantSheet?.classList.remove(
+      "show"
+    );
+
+
+    selectedGroupKey =
+      "";
+
+  }
+
+
+  function renderVariantSheet(
+    group
+  ){
+
+    const inner =
+      document.getElementById(
+        "czRestaurantVariantInner"
+      );
+
+
+    if(!inner){
+      return;
+    }
+
+
+    inner.innerHTML = `
+
+      <div
+        class="czRestaurantVariantImageBox"
+      >
+
+        ${
+          group.image1
+            ? `
+              <img
+                class="czRestaurantVariantImage"
+                src="${escapeRestaurantHTML(group.image1)}"
+                alt="${escapeRestaurantHTML(group.product_name)}"
+              >
+            `
+            : `
+              <div class="czRestaurantFoodNoImage">
+                No Image
+              </div>
+            `
+        }
+
+      </div>
+
+
+      <div
+        class="czRestaurantVariantContent"
+      >
+
+        <h3
+          class="czRestaurantVariantTitle"
+        >
+          ${escapeRestaurantHTML(group.product_name)}
+        </h3>
+
+
+        ${
+          group.short_description
+            ? `
+              <div
+                class="czRestaurantVariantDesc"
+              >
+                ${escapeRestaurantHTML(group.short_description)}
+              </div>
+            `
+            : ""
+        }
+
+
+        <div
+          class="czRestaurantVariantList"
+        >
+
+          ${group.variants.map(
+            function(variant){
+
+              const cartId =
+                restaurantVariantCartId(
+                  variant
+                );
+
+
+              const qty =
+                getRestaurantCartQty(
+                  cartId
+                );
+
+
+              const mrp =
+                Number(
+                  variant.original_price
+                ) || 0;
+
+
+              const price =
+                getRestaurantPrice(
+                  variant
+                );
+
+
+              return `
+
+                <div
+                  class="czRestaurantVariantRow"
+                >
+
+                  <div
+                    class="czRestaurantVariantLeft"
+                  >
+
+                    <div
+                      class="czRestaurantVariantName"
+                    >
+                      ${escapeRestaurantHTML(
+                        cleanVariantName(
+                          variant.item_name ||
+                          "Regular"
+                        )
+                      )}
+                    </div>
+
+
+                    <div
+                      class="czRestaurantVariantPrices"
+                    >
+
+                      ${
+                        mrp > price
+                          ? `
+                            <span
+                              class="czRestaurantVariantMrp"
+                            >
+                              ₹${restaurantMoney(mrp)}
+                            </span>
+                          `
+                          : ""
+                      }
+
+
+                      <span
+                        class="czRestaurantVariantPrice"
+                      >
+                        ₹${restaurantMoney(price)}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+                  ${
+                    isRestaurantVariantOpen(variant)
+                      ? variantActionHTML(
+                          variant,
+                          qty
+                        )
+                      : comingSoonHTML()
+                  }
+
+                </div>
+
+              `;
+
+            }
+          ).join("")}
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  /* =========================================================
+     VARIANT ACTIONS
+  ========================================================= */
+
+  function variantActionHTML(
+    variant,
+    qty
+  ){
+
+    const cartId =
+      restaurantVariantCartId(
+        variant
+      );
+
+
+    if(
+      Number(qty) <= 0
+    ){
+
+      return `
+        <button
+          type="button"
+          class="czRestaurantVariantAdd"
+          data-rest-variant-add="${escapeRestaurantHTML(cartId)}"
+        >
+          ADD
+        </button>
+      `;
+
+    }
+
+
+    return `
+
+      <div
+        class="czRestaurantVariantQty"
+      >
+
+        <button
+          type="button"
+          data-rest-variant-minus="${escapeRestaurantHTML(cartId)}"
+        >
+          −
+        </button>
+
+        <span>
+          ${Number(qty)}
+        </span>
+
+        <button
+          type="button"
+          data-rest-variant-plus="${escapeRestaurantHTML(cartId)}"
+        >
+          +
+        </button>
+
+      </div>
+
+    `;
+
+  }
+
+
+  function handleVariantSheetClick(
+    event
+  ){
+
+    const add =
+      event.target.closest(
+        "[data-rest-variant-add]"
+      );
+
+
+    if(add){
+
+      const variant =
+        findVariantByCartId(
+          add.dataset.restVariantAdd
+        );
+
+
+      if(
+        variant &&
+        isRestaurantVariantOpen(variant)
+      ){
+
+        setRestaurantVariantQty(
+          variant,
+          1
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    const minus =
+      event.target.closest(
+        "[data-rest-variant-minus]"
+      );
+
+
+    if(minus){
+
+      const variant =
+        findVariantByCartId(
+          minus.dataset.restVariantMinus
+        );
+
+
+      if(variant){
+
+        const currentQty =
+          getRestaurantCartQty(
+            restaurantVariantCartId(
+              variant
+            )
+          );
+
+
+        setRestaurantVariantQty(
+          variant,
+          currentQty - 1
+        );
+
+      }
+
+
+      return;
+
+    }
+
+
+    const plus =
+      event.target.closest(
+        "[data-rest-variant-plus]"
+      );
+
+
+    if(plus){
+
+      const variant =
+        findVariantByCartId(
+          plus.dataset.restVariantPlus
+        );
+
+
+      if(
+        variant &&
+        isRestaurantVariantOpen(variant)
+      ){
+
+        const currentQty =
+          getRestaurantCartQty(
+            restaurantVariantCartId(
+              variant
+            )
+          );
+
+
+        setRestaurantVariantQty(
+          variant,
+          currentQty + 1
+        );
+
+      }
+
+    }
+
+  }
+
+
+  /* =========================================================
+     SAME FOOD CART
+  ========================================================= */
+
+  function restaurantVariantCartId(
+    variant
+  ){
+
+    return `restaurant_${variant.id}`;
+
+  }
+
+
+  function getRestaurantCartQty(
+    cartId
+  ){
+
+    if(
+      typeof window
+        .getCezooFoodCartProductQty ===
+      "function"
+    ){
+
+      return Number(
+        window
+          .getCezooFoodCartProductQty(
+            cartId
+          )
+      ) || 0;
+
+    }
+
+
+    try{
+
+      const cart =
+        JSON.parse(
+          localStorage.getItem(
+            "cezooFoodCart"
+          ) || "{}"
+        );
+
+
+      return Number(
+        cart?.[
+          String(cartId)
+        ]?.qty
+      ) || 0;
+
+
+    }catch{
+
+      return 0;
+
+    }
+
+  }
+
+
+  function setRestaurantVariantQty(
+    variant,
+    qty
+  ){
+
+    qty =
+      Math.max(
+        0,
+        Number(qty) || 0
+      );
+
+
+    if(
+      qty > 0 &&
+      !isRestaurantVariantOpen(variant)
+    ){
+      return;
+    }
+
+
+    const product = {
+
+      id:
+        restaurantVariantCartId(
+          variant
+        ),
+
+      product_name:
+        `${cleanMainProductName(
+          variant.product_name
+        )}${
+          variant.item_name
+            ? ` • ${cleanVariantName(
+                variant.item_name
+              )}`
+            : ""
+        }`,
+
+      image1:
+        variant.image1 ||
+        findGroupImage(
+          variant
+        ) ||
+        "",
+
+      quantity:
+        cleanVariantName(
+          variant.item_name ||
+          "Regular"
+        ),
+
+      original_price:
+        Number(
+          variant.original_price
+        ) || 0,
+
+      discount_price:
+        getRestaurantPrice(
+          variant
+        ),
+
+      restaurant_name:
+        variant.restaurant_name ||
+        "",
+
+      source_table:
+        RESTAURANT_TABLE,
+
+      source_id:
+        variant.id
+
+    };
+
+
+    if(
+      typeof window
+        .setCezooFoodCartProductQty ===
+      "function"
+    ){
+
+      window
+        .setCezooFoodCartProductQty(
+          product,
+          qty
+        );
+
+    }
+
+
+    if(
+      typeof window.syncCezooFoodCartBar ===
+      "function"
+    ){
+      window.syncCezooFoodCartBar();
+    }
+
+
+    /*
+      Refresh the restaurant cards immediately:
+      ADD -> − 1 +, and quantity stays synced with cart.
+    */
+
+    renderRestaurantFullPage();
+
+
+    const selected =
+      findRestaurantGroup(
+        selectedGroupKey
+      );
+
+
+    if(selected){
+
+      renderVariantSheet(
+        selected
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     COMING SOON
+  ========================================================= */
+
+  function comingSoonHTML(){
+
+    return `
+
+      <div
+        class="czRestaurantSoon"
+        aria-label="Coming Soon"
+      >
+
+        <span
+          class="czRestaurantSoonHook"
+        ></span>
+
+        <div
+          class="czRestaurantSoonBoard"
+        >
+          COMING SOON
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  /* =========================================================
+     REALTIME
+  ========================================================= */
+
+  function startRealtime(){
+
+    if(
+      realtimeChannel ||
+      !window._supabaseClient
+    ){
+      return;
+    }
+
+
+    realtimeChannel =
+      window._supabaseClient
+        .channel(
+          "cezoo-restaurant-full-live"
+        )
+        .on(
+          "postgres_changes",
+          {
+            event:"*",
+            schema:"public",
+            table:
+              RESTAURANT_TABLE
+          },
+          function(){
+
+            restaurantLoaded =
+              false;
+
+            restaurantLoading =
+              false;
+
+
+            if(
+              isFoodModeActive()
+            ){
+
+              loadRestaurantData();
+
+            }
+
+          }
+        )
+        .subscribe();
+
+  }
+
+
+  /* =========================================================
+     MODE WATCHER
+  ========================================================= */
+
+  function watchRestaurantMode(){
+
+    if(modeObserver){
+      return;
+    }
+
+
+    modeObserver =
+      new MutationObserver(
+        function(mutations){
+
+          for(
+            const mutation
+            of mutations
+          ){
+
+            if(
+              mutation.type === "attributes" &&
+              mutation.attributeName ===
+                "data-cezoo-mode"
+            ){
+
+              requestAnimationFrame(
+                function(){
+
+                  if(
+                    isFoodModeActive()
+                  ){
+
+                    checkRestaurantMode();
+
+                  }else{
+
+                    closeRestaurantPage(
+                      false
+                    );
+
+                    closeVariantSheet();
+
+                  }
+
+                }
+              );
+
+            }
+
+          }
+
+        }
+      );
+
+
+    modeObserver.observe(
+      document.body,
+      {
+        attributes:true,
+        attributeFilter:[
+          "data-cezoo-mode"
+        ]
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     HELPERS
+  ========================================================= */
+
+  function findRestaurantGroup(
+    key
+  ){
+
+    return restaurantGroups.find(
+      group =>
+        String(group.key) ===
+        String(key)
+    ) || null;
+
+  }
+
+
+  function findVariantByCartId(
+    cartId
+  ){
+
+    return restaurantRows.find(
+      variant =>
+        restaurantVariantCartId(
+          variant
+        ) ===
+        String(cartId)
+    ) || null;
+
+  }
+
+
+  function findGroupImage(
+    variant
+  ){
+
+    const product =
+      cleanMainProductName(
+        variant.product_name
+      )
+        .toLowerCase();
+
+
+    const restaurant =
+      String(
+        variant.restaurant_name ||
+        ""
+      )
+        .trim()
+        .toLowerCase();
+
+
+    const group =
+      restaurantGroups.find(
+        item =>
+          item.product_name
+            .toLowerCase() ===
+            product &&
+          String(
+            item.restaurant_name ||
+            ""
+          )
+            .trim()
+            .toLowerCase() ===
+            restaurant
+      );
+
+
+    return group?.image1 || "";
+
+  }
+
+
+  function cleanMainProductName(
+    value
+  ){
+
+    return String(
+      value || ""
+    )
+      .replace(
+        /\s*[-–—]\s*(half|full)(\s+portion)?\s*$/i,
+        ""
+      )
+      .replace(
+        /\s+(half|full)\s+portion\s*$/i,
+        ""
+      )
+      .trim();
+
+  }
+
+
+  function cleanVariantName(
+    value
+  ){
+
+    return String(
+      value || "Regular"
+    )
+      .replace(
+        /\s+portion\s*$/i,
+        ""
+      )
+      .trim();
+
+  }
+
+
+  function cleanMainDescription(
+    value,
+    productName
+  ){
+
+    let description =
+      String(
+        value || ""
+      ).trim();
+
+
+    if(!description){
+      return "";
+    }
+
+
+    /*
+      Do not show descriptions like:
+      "Chicken Fry Piece Biryani - half portion"
+      on the MAIN card.
+    */
+
+    const normalizedDescription =
+      description
+        .toLowerCase()
+        .replace(/\s+/g," ")
+        .trim();
+
+
+    const normalizedName =
+      String(
+        productName || ""
+      )
+        .toLowerCase()
+        .replace(/\s+/g," ")
+        .trim();
+
+
+    if(
+      normalizedDescription ===
+        `${normalizedName} - half portion` ||
+      normalizedDescription ===
+        `${normalizedName} - full portion` ||
+      normalizedDescription ===
+        `${normalizedName} half portion` ||
+      normalizedDescription ===
+        `${normalizedName} full portion`
+    ){
+
+      return "";
+
+    }
+
+
+    return description;
+
+  }
+
+
+  function isRestaurantVariantOpen(
+    variant
+  ){
+
+    if(!variant){
+      return false;
+    }
+
+
+    /*
+      Supabase values should be boolean, but this keeps the UI
+      working safely if older rows contain null / "true" / 1.
+      Only explicit false-like values are treated as closed.
+    */
+
+    const value =
+      variant.is_open;
+
+
+    if(
+      value === false ||
+      value === 0 ||
+      value === "0" ||
+      String(value).toLowerCase() === "false"
+    ){
+      return false;
+    }
+
+
+    return true;
+
+  }
+
+
+  function getRestaurantPrice(
+    row
+  ){
+
+    const discount =
+      Number(
+        row.discount_price
+      );
+
+
+    if(
+      Number.isFinite(discount) &&
+      discount > 0
+    ){
+
+      return discount;
+
+    }
+
+
+    return Number(
+      row.original_price
+    ) || 0;
+
+  }
+
+
+  function restaurantMoney(
+    value
+  ){
+
+    const number =
+      Number(value);
+
+
+    if(
+      !Number.isFinite(number)
+    ){
+      return "0";
+    }
+
+
+    return Number.isInteger(
+      number
+    )
+      ? String(number)
+      : number.toFixed(2);
+
+  }
+
+
+  function escapeRestaurantHTML(
+    value
+  ){
+
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
+
+  }
+
+
+  
+  function syncRestaurantTopName(){
+    const topName = document.getElementById("czRestaurantTopName");
+    if(!topName) return;
+
+    const pageName = document.getElementById("czRestaurantPageName");
+    if(pageName && pageName.textContent.trim()){
+      topName.textContent = pageName.textContent.trim();
+    }
+  }
+
+/* =========================================================
+     GLOBAL RELOAD
+  ========================================================= */
+
+  window.reloadCezooRestaurantFoodItems =
+    async function(){
+
+      restaurantLoaded =
+        false;
+
+      restaurantLoading =
+        false;
+
+      await checkRestaurantMode();
+
+    };
 
 
 })();
