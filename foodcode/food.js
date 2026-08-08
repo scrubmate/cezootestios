@@ -1540,7 +1540,7 @@
         #cezooFoodPage{
           padding-bottom:
             calc(
-              165px +
+              90px +
               env(safe-area-inset-bottom)
             ) !important;
         }
@@ -1548,7 +1548,7 @@
         #cezooFoodPage::after{
           height:
             calc(
-              80px +
+              30px +
               env(safe-area-inset-bottom)
             );
         }
@@ -4665,6 +4665,58 @@
 
 
       /* =====================================
+         CENTER PNG BELOW HANGERS
+         Uses: food/center.png
+      ===================================== */
+
+      .czRestaurantCenterArt{
+        position:fixed;
+
+        top:
+          calc(
+            101px +
+            env(safe-area-inset-top)
+          );
+
+        left:50%;
+
+        z-index:2147483303;
+
+        width:100%;
+        height:72px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        transform:translateX(-50%);
+
+        pointer-events:none;
+      }
+
+      .czRestaurantCenterArtImage{
+        display:block;
+
+        width:min(180px, 48vw);
+        height:68px;
+
+        object-fit:contain;
+        object-position:center;
+
+        opacity:0;
+
+        transition:
+          opacity .16s ease;
+
+        background:transparent;
+      }
+
+      .czRestaurantCenterArtImage.is-loaded{
+        opacity:1;
+      }
+
+
+      /* =====================================
          MAIN RESTAURANT ENTRY
       ===================================== */
 
@@ -5061,8 +5113,10 @@
         grid-template-columns:
           repeat(
             2,
-            minmax(0,1fr)
+            minmax(0, 142px)
           );
+
+        justify-content:center;
 
         gap:
           9px
@@ -5070,12 +5124,12 @@
 
         padding:
           calc(
-            114px +
+            178px +
             env(safe-area-inset-top)
           )
           14px
           calc(
-            150px +
+            112px +
             env(safe-area-inset-bottom)
           );
 
@@ -5088,7 +5142,11 @@
       ===================================== */
 
       .czRestaurantFoodCard{
+        width:100%;
+        max-width:142px;
         min-width:0;
+
+        justify-self:center;
 
         background:#fff;
 
@@ -5097,7 +5155,7 @@
           solid
           #ececec;
 
-        border-radius:12px;
+        border-radius:11px;
 
         overflow:hidden;
 
@@ -5117,9 +5175,7 @@
         position:relative;
 
         width:100%;
-
-        aspect-ratio:
-          1.30 / 1;
+        height:104px;
 
         overflow:hidden;
 
@@ -5158,7 +5214,7 @@
 
       .czRestaurantFoodInfo{
         padding:
-          5px
+          4px
           6px
           6px;
       }
@@ -5178,10 +5234,10 @@
 
         color:#2a2a2a;
 
-        font-size:11px;
+        font-size:10.5px;
         font-weight:750;
 
-        line-height:1.12;
+        line-height:1.08;
       }
 
       .czRestaurantFoodDesc{
@@ -5194,9 +5250,9 @@
         align-items:center;
         justify-content:space-between;
 
-        gap:5px;
+        gap:4px;
 
-        margin-top:3px;
+        margin-top:2px;
       }
 
       .czRestaurantFoodFrom{
@@ -5230,7 +5286,7 @@
       .czRestaurantFoodPrice{
         color:#222;
 
-        font-size:12px;
+        font-size:11.5px;
         font-weight:800;
       }
 
@@ -5242,8 +5298,8 @@
       .czRestaurantFoodAdd{
         flex:0 0 auto;
 
-        width:54px;
-        height:29px;
+        width:48px;
+        height:27px;
 
         display:flex;
 
@@ -5263,7 +5319,7 @@
 
         color:#15945c;
 
-        font-size:10px;
+        font-size:9px;
         font-weight:800;
 
         box-shadow:none;
@@ -5391,14 +5447,14 @@
       .czRestaurantFoodQty{
         flex:0 0 auto;
 
-        height:31px;
+        height:27px;
 
         display:grid;
 
         grid-template-columns:
-          25px
           22px
-          25px;
+          19px
+          22px;
 
         align-items:center;
         justify-items:center;
@@ -5411,8 +5467,8 @@
       }
 
       .czRestaurantFoodQty button{
-        width:25px;
-        height:31px;
+        width:22px;
+        height:27px;
 
         display:flex;
 
@@ -5428,7 +5484,7 @@
 
         color:#fff;
 
-        font-size:16px;
+        font-size:15px;
 
         line-height:1;
 
@@ -5436,11 +5492,11 @@
       }
 
       .czRestaurantFoodQty span{
-        width:22px;
+        width:19px;
 
         color:#fff;
 
-        font-size:10px;
+        font-size:9.5px;
         font-weight:800;
 
         text-align:center;
@@ -5973,20 +6029,45 @@
         }
 
         .czRestaurantFoodsGrid{
+          grid-template-columns:
+            repeat(
+              2,
+              minmax(0, 138px)
+            );
+
+          justify-content:center;
+
           gap:
             8px
             8px;
 
           padding:
             calc(
-              112px +
+              176px +
               env(safe-area-inset-top)
             )
             12px
             calc(
-              155px +
+              108px +
               env(safe-area-inset-bottom)
             );
+        }
+
+        .czRestaurantFoodCard{
+          max-width:138px;
+        }
+
+        .czRestaurantFoodImageBox{
+          height:101px;
+        }
+
+        .czRestaurantCenterArt{
+          height:70px;
+        }
+
+        .czRestaurantCenterArtImage{
+          width:min(172px, 50vw);
+          height:66px;
         }
 
         .czRestaurantFoodName{
@@ -5999,16 +6080,35 @@
       @media(max-width:370px){
 
         .czRestaurantFoodsGrid{
+          grid-template-columns:
+            repeat(
+              2,
+              minmax(0, 126px)
+            );
+
           gap:
-            11px
+            8px
             7px;
 
-          padding-left:6px;
-          padding-right:6px;
+          padding-left:8px;
+          padding-right:8px;
+        }
+
+        .czRestaurantFoodCard{
+          max-width:126px;
+        }
+
+        .czRestaurantFoodImageBox{
+          height:94px;
         }
 
         .czRestaurantFoodName{
           font-size:10px;
+        }
+
+        .czRestaurantCenterArtImage{
+          width:min(158px, 48vw);
+          height:62px;
         }
 
       }
@@ -6117,6 +6217,17 @@
             <span>FOOD</span>
           </div>
 
+        </div>
+
+
+        <div class="czRestaurantCenterArt">
+          <img
+            id="czRestaurantCenterArtImage"
+            class="czRestaurantCenterArtImage"
+            data-src="foods/alif.png"
+            alt=""
+            decoding="async"
+          >
         </div>
 
 
@@ -6817,6 +6928,38 @@
 
   function openRestaurantPage(){
 
+    const centerArt =
+      document.getElementById(
+        "czRestaurantCenterArtImage"
+      );
+
+
+    if(
+      centerArt &&
+      !centerArt.getAttribute("src")
+    ){
+
+      const centerSrc =
+        centerArt.dataset.src ||
+        "foods/alif.png";
+
+
+      centerArt.onload =
+        function(){
+
+          centerArt.classList.add(
+            "is-loaded"
+          );
+
+        };
+
+
+      centerArt.src =
+        centerSrc;
+
+    }
+
+
     renderRestaurantFullPage();
 
 
@@ -7307,12 +7450,17 @@
                     </div>
 
 
-                    ${
-                      restaurantMainActionHTML(
-                        group,
-                        allClosed
-                      )
-                    }
+                    <div
+                      class="czRestaurantFoodAction"
+                      data-rest-food-action="${escapeRestaurantHTML(group.key)}"
+                    >
+                      ${
+                        restaurantMainActionHTML(
+                          group,
+                          allClosed
+                        )
+                      }
+                    </div>
 
                   </div>
 
@@ -7325,6 +7473,64 @@
           }
         )
         .join("");
+
+  }
+
+
+  function updateRestaurantMainCardAction(
+    groupKey
+  ){
+
+    const group =
+      findRestaurantGroup(
+        groupKey
+      );
+
+
+    if(!group){
+      return;
+    }
+
+
+    const action =
+      Array.from(
+        document.querySelectorAll(
+          "[data-rest-food-action]"
+        )
+      ).find(
+        element =>
+          String(
+            element.getAttribute(
+              "data-rest-food-action"
+            )
+          ) ===
+          String(group.key)
+      );
+
+
+    if(!action){
+      return;
+    }
+
+
+    const openVariants =
+      group.variants.filter(
+        variant =>
+          isRestaurantVariantOpen(
+            variant
+          )
+      );
+
+
+    const allClosed =
+      openVariants.length === 0;
+
+
+    action.innerHTML =
+      restaurantMainActionHTML(
+        group,
+        allClosed
+      );
 
   }
 
@@ -8115,11 +8321,36 @@
 
 
     /*
-      Refresh the restaurant cards immediately:
-      ADD -> − 1 +, and quantity stays synced with cart.
+      IMPORTANT:
+      Update only the affected product controls.
+      Do not rebuild the full restaurant grid — this removes
+      the ADD / + / - page blinking.
     */
 
-    renderRestaurantFullPage();
+    const affectedGroup =
+      restaurantGroups.find(
+        function(group){
+
+          return group.variants.some(
+            function(item){
+
+              return String(item.id) ===
+                String(variant.id);
+
+            }
+          );
+
+        }
+      );
+
+
+    if(affectedGroup){
+
+      updateRestaurantMainCardAction(
+        affectedGroup.key
+      );
+
+    }
 
 
     const selected =
