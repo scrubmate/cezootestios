@@ -6861,9 +6861,13 @@
                 >
               `
               : `
-                <div class="czRestaurantEntryNoImage">
-                  Restaurant Image
-                </div>
+                <img
+                  class="czRestaurantEntryImage"
+                  src="foods/alif.png"
+                  alt="Alif Food Point"
+                  loading="lazy"
+                  decoding="async"
+                >
               `
           }
 
