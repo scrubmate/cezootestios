@@ -36,9 +36,14 @@
 
   let cartBar = null;
 
+  /* Food data should load only when FOOD mode is opened */
+  let foodProductsLoaded = false;
+  let foodProductsLoading = false;
+
 
   /* =========================================================
      START
+     Prepare Food UI only. Do NOT fetch Supabase products yet.
   ========================================================= */
 
   if (
@@ -47,7 +52,7 @@
 
     document.addEventListener(
       "DOMContentLoaded",
-      init,
+      initBase,
       {
         once:true
       }
@@ -55,17 +60,16 @@
 
   } else {
 
-    init();
+    initBase();
 
   }
 
 
   /* =========================================================
-     INIT
+     BASE INIT — NO PRODUCT PRELOAD
   ========================================================= */
 
-  async function init() {
-
+  function initBase() {
 
     section =
       document.getElementById(
@@ -84,27 +88,16 @@
 
 
     if (
-      section.dataset.foodReady === "1"
+      section.dataset.foodUiReady === "1"
     ) {
 
+      checkAndLoadFoodMode();
       return;
     }
 
 
-    section.dataset.foodReady =
+    section.dataset.foodUiReady =
       "1";
-
-
-    if (
-      !window._supabaseClient
-    ) {
-
-      console.error(
-        "Supabase client not found"
-      );
-
-      return;
-    }
 
 
     loadCart();
@@ -121,7 +114,74 @@
 
     updateCartBar();
 
-    await loadProducts();
+    /*
+      IMPORTANT:
+      Food products are NOT fetched here.
+      They load only when data-cezoo-mode becomes "food".
+    */
+    checkAndLoadFoodMode();
+
+  }
+
+
+  /* =========================================================
+     FOOD MODE LAZY LOADER
+  ========================================================= */
+
+  function isFoodModeActive() {
+
+    return (
+      document.body.getAttribute(
+        "data-cezoo-mode"
+      ) === "food"
+    );
+
+  }
+
+
+  async function checkAndLoadFoodMode() {
+
+    syncCezooFoodCartVisibility();
+
+    if (!isFoodModeActive()) {
+      return;
+    }
+
+    if (
+      foodProductsLoaded ||
+      foodProductsLoading
+    ) {
+      return;
+    }
+
+    if (!window._supabaseClient) {
+
+      console.error(
+        "Supabase client not found"
+      );
+
+      return;
+    }
+
+    foodProductsLoading = true;
+
+    try {
+
+      await loadProducts();
+      foodProductsLoaded = true;
+
+    } catch (error) {
+
+      console.error(
+        "Food lazy-load error:",
+        error
+      );
+
+    } finally {
+
+      foodProductsLoading = false;
+
+    }
 
   }
 
@@ -2910,7 +2970,7 @@
 
 
       title.textContent =
-        `${items.length} items added`;
+        "Your Food Cart";
 
     }
 
@@ -2926,7 +2986,9 @@
         : `${totalQuantity} items`;
 
 
-    syncCezooFoodCartVisibility();
+    cartBar.classList.add(
+      "show"
+    );
 
 
     /*
@@ -3264,66 +3326,172 @@
 
 
   /* =========================================================
-     FOOD-ONLY CART VISIBILITY
-     Cart stays saved, but is hidden outside Food mode.
+     FOOD-ONLY CART VISIBILITY + MODE WATCHER
+     Cart data stays saved, but UI is hidden outside FOOD.
   ========================================================= */
 
   function isCezooFoodPageVisible() {
-    const foodPage = document.getElementById("cezooFoodPage");
-    if (!foodPage) return false;
 
-    const style = window.getComputedStyle(foodPage);
-    const ariaHidden = foodPage.getAttribute("aria-hidden");
+    const foodPage =
+      document.getElementById(
+        "cezooFoodPage"
+      );
+
+    if (!foodPage) {
+      return false;
+    }
+
+    const style =
+      window.getComputedStyle(foodPage);
+
+    const ariaHidden =
+      foodPage.getAttribute(
+        "aria-hidden"
+      );
 
     return (
+      isFoodModeActive() &&
       ariaHidden !== "true" &&
       style.display !== "none" &&
       style.visibility !== "hidden" &&
       Number(style.opacity || "1") !== 0
     );
+
   }
+
 
   function syncCezooFoodCartVisibility() {
-    if (!cartBar) return;
 
-    const totalQuantity = getCartItems().reduce(
-      (total, item) => total + (Number(item.qty) || 0),
-      0
-    );
-
-    cartBar.classList.toggle(
-      "show",
-      isCezooFoodPageVisible() && totalQuantity > 0
-    );
-  }
-
-  function watchCezooFoodPageVisibility() {
-    const foodPage = document.getElementById("cezooFoodPage");
-    if (!foodPage) {
-      syncCezooFoodCartVisibility();
+    if (!cartBar) {
       return;
     }
 
-    const observer = new MutationObserver(() => {
-      requestAnimationFrame(syncCezooFoodCartVisibility);
-    });
+    const totalQuantity =
+      getCartItems().reduce(
+        (total, item) =>
+          total + (Number(item.qty) || 0),
+        0
+      );
 
-    observer.observe(foodPage, {
-      attributes: true,
-      attributeFilter: ["class", "style", "aria-hidden", "hidden"]
-    });
+    cartBar.classList.toggle(
+      "show",
+      isCezooFoodPageVisible() &&
+      totalQuantity > 0
+    );
 
-    document.addEventListener("click", () => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(syncCezooFoodCartVisibility);
-      });
-    }, { passive: true });
+  }
 
-    window.addEventListener("pageshow", syncCezooFoodCartVisibility);
-    window.addEventListener("popstate", syncCezooFoodCartVisibility);
+
+  function watchCezooFoodPageVisibility() {
+
+    const foodPage =
+      document.getElementById(
+        "cezooFoodPage"
+      );
+
+    /*
+      Your CEZOO / FOOD / SPECIAL switch changes
+      body[data-cezoo-mode]. Watch that directly.
+    */
+    const bodyObserver =
+      new MutationObserver(
+        function(mutations) {
+
+          for (const mutation of mutations) {
+
+            if (
+              mutation.type === "attributes" &&
+              mutation.attributeName ===
+                "data-cezoo-mode"
+            ) {
+
+              requestAnimationFrame(
+                function() {
+
+                  syncCezooFoodCartVisibility();
+                  checkAndLoadFoodMode();
+
+                  /* Close Food sheet if user leaves Food mode */
+                  if (!isFoodModeActive()) {
+                    if (overlay) overlay.classList.remove("show");
+                    if (sheet) sheet.classList.remove("show");
+                    selectedProduct = null;
+                    document.body.style.overflow = "";
+                  }
+
+                }
+              );
+
+            }
+
+          }
+
+        }
+      );
+
+    bodyObserver.observe(
+      document.body,
+      {
+        attributes:true,
+        attributeFilter:[
+          "data-cezoo-mode"
+        ]
+      }
+    );
+
+
+    if (foodPage) {
+
+      const foodPageObserver =
+        new MutationObserver(
+          function() {
+
+            requestAnimationFrame(
+              function() {
+                syncCezooFoodCartVisibility();
+                checkAndLoadFoodMode();
+              }
+            );
+
+          }
+        );
+
+      foodPageObserver.observe(
+        foodPage,
+        {
+          attributes:true,
+          attributeFilter:[
+            "class",
+            "style",
+            "aria-hidden",
+            "hidden"
+          ]
+        }
+      );
+
+    }
+
+
+    window.addEventListener(
+      "pageshow",
+      function() {
+        syncCezooFoodCartVisibility();
+        checkAndLoadFoodMode();
+      }
+    );
+
+    window.addEventListener(
+      "popstate",
+      function() {
+        syncCezooFoodCartVisibility();
+        checkAndLoadFoodMode();
+      }
+    );
 
     syncCezooFoodCartVisibility();
+
   }
+
 
   /* =========================================================
      GLOBAL HELPERS
@@ -3376,7 +3544,14 @@
 
 
   window.reloadCezooFoodItems =
-    loadProducts;
+    async function() {
+
+      foodProductsLoaded = false;
+      foodProductsLoading = false;
+
+      await checkAndLoadFoodMode();
+
+    };
 
 
 })();
