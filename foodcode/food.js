@@ -1502,6 +1502,60 @@
       }
 
 
+      /* =====================================
+         MAIN FOOD PAGE BOTTOM SCROLL GAP
+         Lets the final Food content scroll fully upward
+      ===================================== */
+
+      #cezooFoodPage{
+        padding-bottom:
+          calc(
+            150px +
+            env(safe-area-inset-bottom)
+          ) !important;
+
+        box-sizing:border-box;
+      }
+
+      #cezooFoodPage::after{
+        content:"";
+
+        display:block;
+
+        width:100%;
+        height:
+          calc(
+            70px +
+            env(safe-area-inset-bottom)
+          );
+
+        flex:0 0 auto;
+
+        pointer-events:none;
+      }
+
+
+      @media(max-width:600px){
+
+        #cezooFoodPage{
+          padding-bottom:
+            calc(
+              165px +
+              env(safe-area-inset-bottom)
+            ) !important;
+        }
+
+        #cezooFoodPage::after{
+          height:
+            calc(
+              80px +
+              env(safe-area-inset-bottom)
+            );
+        }
+
+      }
+
+
       @media(
         prefers-reduced-motion:
         reduce
@@ -4249,6 +4303,8 @@
 
   let realtimeChannel = null;
   let modeObserver = null;
+  let restaurantViewportObserver = null;
+  let restaurantSectionSeen = false;
 
   let swipeStartX = 0;
   let swipeStartY = 0;
@@ -4354,7 +4410,7 @@
 
     watchRestaurantMode();
 
-    checkRestaurantMode();
+    setupRestaurantViewportLazyLoad();
 
   }
 
@@ -4422,6 +4478,193 @@
     style.textContent = `
 
       /* =====================================
+         RESTAURANT SHIMMER
+      ===================================== */
+
+      .czRestaurantShimmer{
+        width:100%;
+
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+
+        gap:10px;
+
+        padding:0;
+      }
+
+      .czRestaurantShimmerCard{
+        overflow:hidden;
+
+        border:1px solid #ededed;
+
+        border-radius:11px;
+
+        background:#fff;
+      }
+
+      .czRestaurantShimmerImage,
+      .czRestaurantShimmerLine{
+        position:relative;
+        overflow:hidden;
+
+        background:#f1f1f1;
+      }
+
+      .czRestaurantShimmerImage{
+        width:100%;
+        aspect-ratio:1.28 / 1;
+      }
+
+      .czRestaurantShimmerBody{
+        padding:7px;
+      }
+
+      .czRestaurantShimmerLine{
+        height:9px;
+
+        margin-top:6px;
+
+        border-radius:5px;
+      }
+
+      .czRestaurantShimmerLine.short{
+        width:58%;
+      }
+
+      .czRestaurantShimmerImage::after,
+      .czRestaurantShimmerLine::after{
+        content:"";
+
+        position:absolute;
+        inset:0;
+
+        transform:translateX(-100%);
+
+        background:
+          linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.72),
+            transparent
+          );
+
+        animation:
+          czRestaurantShimmerMove
+          1.15s
+          infinite;
+      }
+
+      @keyframes czRestaurantShimmerMove{
+        100%{
+          transform:translateX(100%);
+        }
+      }
+
+
+      /* =====================================
+         FULL PAGE TOP HANGERS
+      ===================================== */
+
+      .czRestaurantTopDecor{
+        position:fixed;
+
+        top:
+          calc(
+            75px +
+            env(safe-area-inset-top)
+          );
+
+        left:0;
+        right:0;
+
+        z-index:2147483303;
+
+        height:36px;
+
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+
+        padding:
+          0
+          13px;
+
+        pointer-events:none;
+
+        box-sizing:border-box;
+      }
+
+      .czRestaurantTopHanger{
+        position:relative;
+
+        width:64px;
+        height:27px;
+
+        display:flex;
+        align-items:flex-end;
+        justify-content:center;
+      }
+
+      .czRestaurantTopHanger::before,
+      .czRestaurantTopHanger::after{
+        content:"";
+
+        position:absolute;
+
+        top:0;
+
+        width:1px;
+        height:9px;
+
+        background:#15945c;
+      }
+
+      .czRestaurantTopHanger::before{
+        left:20px;
+
+        transform:rotate(7deg);
+      }
+
+      .czRestaurantTopHanger::after{
+        right:20px;
+
+        transform:rotate(-7deg);
+      }
+
+      .czRestaurantTopHanger span{
+        width:62px;
+        height:22px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        box-sizing:border-box;
+
+        border:
+          1px solid
+          #15945c;
+
+        border-radius:7px;
+
+        background:#fff;
+
+        color:#15945c;
+
+        font-size:7px;
+        font-weight:800;
+
+        letter-spacing:.3px;
+
+        box-shadow:
+          0
+          2px
+          5px
+          rgba(0,0,0,.05);
+      }
+
+
+      /* =====================================
          MAIN RESTAURANT ENTRY
       ===================================== */
 
@@ -4445,9 +4688,9 @@
         display:flex;
         align-items:center;
 
-        gap:12px;
+        gap:9px;
 
-        padding:8px 0;
+        padding:5px 0;
 
         background:transparent;
 
@@ -4466,12 +4709,12 @@
       .czRestaurantEntryImageBox{
         flex:0 0 auto;
 
-        width:94px;
-        height:76px;
+        width:82px;
+        height:66px;
 
         overflow:hidden;
 
-        border-radius:13px;
+        border-radius:11px;
 
         background:#f4f4f4;
       }
@@ -4603,6 +4846,14 @@
         overflow-y:auto;
         overflow-x:hidden;
 
+        padding-bottom:
+          calc(
+            24px +
+            env(safe-area-inset-bottom)
+          );
+
+        box-sizing:border-box;
+
         background:#fff;
 
         transform:
@@ -4616,7 +4867,7 @@
           transform .25s
           cubic-bezier(.22,.75,.25,1);
 
-        overscroll-behavior:contain;
+        overscroll-behavior-y:auto;
 
         -webkit-overflow-scrolling:touch;
       }
@@ -4814,17 +5065,17 @@
           );
 
         gap:
-          11px
-          10px;
+          9px
+          9px;
 
         padding:
           calc(
-            76px +
+            114px +
             env(safe-area-inset-top)
           )
           14px
           calc(
-            100px +
+            150px +
             env(safe-area-inset-bottom)
           );
 
@@ -4868,13 +5119,13 @@
         width:100%;
 
         aspect-ratio:
-          1.24 / 1;
+          1.30 / 1;
 
         overflow:hidden;
 
         border-radius:
-          11px
-          11px
+          10px
+          10px
           0
           0;
 
@@ -4907,9 +5158,9 @@
 
       .czRestaurantFoodInfo{
         padding:
+          5px
           6px
-          7px
-          7px;
+          6px;
       }
 
       .czRestaurantFoodName{
@@ -4927,10 +5178,10 @@
 
         color:#2a2a2a;
 
-        font-size:12px;
+        font-size:11px;
         font-weight:750;
 
-        line-height:1.14;
+        line-height:1.12;
       }
 
       .czRestaurantFoodDesc{
@@ -4979,7 +5230,7 @@
       .czRestaurantFoodPrice{
         color:#222;
 
-        font-size:13px;
+        font-size:12px;
         font-weight:800;
       }
 
@@ -4991,8 +5242,8 @@
       .czRestaurantFoodAdd{
         flex:0 0 auto;
 
-        width:58px;
-        height:31px;
+        width:54px;
+        height:29px;
 
         display:flex;
 
@@ -5195,6 +5446,114 @@
         text-align:center;
       }
 
+
+      /* =====================================
+         VARIANT POPUP BIG HANGER
+      ===================================== */
+
+      .czRestaurantPopupHanger{
+        position:relative;
+
+        width:118px;
+        height:39px;
+
+        display:flex;
+        align-items:flex-end;
+        justify-content:center;
+
+        margin:
+          1px
+          auto
+          2px;
+
+        pointer-events:none;
+      }
+
+      .czRestaurantPopupHanger::before,
+      .czRestaurantPopupHanger::after{
+        content:"";
+
+        position:absolute;
+
+        top:0;
+
+        width:1.5px;
+        height:13px;
+
+        background:#15945c;
+      }
+
+      .czRestaurantPopupHanger::before{
+        left:35px;
+        transform:rotate(10deg);
+      }
+
+      .czRestaurantPopupHanger::after{
+        right:35px;
+        transform:rotate(-10deg);
+      }
+
+      .czRestaurantPopupHangerHook{
+        position:absolute;
+
+        top:-1px;
+        left:50%;
+
+        width:23px;
+        height:10px;
+
+        transform:translateX(-50%);
+
+        border:
+          1.5px solid
+          #15945c;
+
+        border-bottom:0;
+
+        border-radius:
+          12px
+          12px
+          0
+          0;
+
+        box-sizing:border-box;
+      }
+
+      .czRestaurantPopupHangerBoard{
+        width:116px;
+        height:29px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        padding:0 9px;
+
+        box-sizing:border-box;
+
+        border:
+          1.5px solid
+          #15945c;
+
+        border-radius:8px;
+
+        background:#fff;
+
+        color:#15945c;
+
+        font-size:9px;
+        font-weight:800;
+
+        letter-spacing:.6px;
+
+        box-shadow:
+          0
+          2px
+          6px
+          rgba(0,0,0,.06);
+      }
+
+
       .czRestaurantVariantOverlay{
         position:fixed;
 
@@ -5239,19 +5598,19 @@
 
         width:
           min(
-            calc(100% - 8px),
-            540px
+            calc(100% - 16px),
+            460px
           );
 
-        max-height:72vh;
+        max-height:66vh;
 
         overflow-y:auto;
 
         padding:
           8px
-          13px
+          12px
           calc(
-            17px +
+            15px +
             env(safe-area-inset-bottom)
           );
 
@@ -5260,8 +5619,8 @@
         background:#fff;
 
         border-radius:
-          20px
-          20px
+          19px
+          19px
           0
           0;
 
@@ -5277,9 +5636,9 @@
 
         box-shadow:
           0
-          -8px
-          25px
-          rgba(0,0,0,.14);
+          -7px
+          22px
+          rgba(0,0,0,.13);
       }
 
       .czRestaurantVariantSheet.show{
@@ -5292,13 +5651,13 @@
       }
 
       .czRestaurantVariantHandle{
-        width:34px;
+        width:32px;
         height:4px;
 
         margin:
           0
           auto
-          8px;
+          7px;
 
         border-radius:999px;
 
@@ -5335,13 +5694,13 @@
       }
 
       .czRestaurantVariantImageBox{
-        width:
-          calc(100% + 26px);
+        width:100%;
+        height:145px;
 
-        height:180px;
-
-        margin-left:-13px;
-        margin-right:-13px;
+        margin:
+          5px
+          0
+          0;
 
         display:flex;
 
@@ -5350,36 +5709,44 @@
 
         overflow:hidden;
 
-        background:#f6f6f6;
+        background:#fff;
+
+        border-radius:12px;
+
+        box-sizing:border-box;
       }
 
       .czRestaurantVariantImage{
-        width:100%;
-        height:100%;
-
         display:block;
 
+        width:min(78%, 230px);
+        height:135px;
+
+        margin:0 auto;
+
         object-fit:contain;
-        object-position:center;
+        object-position:center center;
+
+        background:transparent;
       }
 
       .czRestaurantVariantContent{
-        padding-top:12px;
+        padding-top:7px;
       }
 
       .czRestaurantVariantTitle{
         margin:
           0
-          38px
+          34px
           0
           0;
 
         color:#202020;
 
-        font-size:18px;
+        font-size:16px;
         font-weight:750;
 
-        line-height:1.2;
+        line-height:1.15;
       }
 
       .czRestaurantVariantDesc{
@@ -5397,9 +5764,9 @@
 
         flex-direction:column;
 
-        gap:8px;
+        gap:7px;
 
-        margin-top:12px;
+        margin-top:9px;
       }
 
       .czRestaurantVariantRow{
@@ -5578,6 +5945,25 @@
 
       @media(max-width:600px){
 
+        .czRestaurantVariantSheet{
+          width:calc(100% - 12px);
+          max-height:64vh;
+        }
+
+        .czRestaurantVariantImageBox{
+          height:132px;
+        }
+
+        .czRestaurantVariantImage{
+          width:min(76%, 210px);
+          height:124px;
+        }
+
+        .czRestaurantPopupHanger{
+          transform:scale(.95);
+          transform-origin:center top;
+        }
+
         .czRestaurantHero{
           display:none;
         }
@@ -5588,17 +5974,17 @@
 
         .czRestaurantFoodsGrid{
           gap:
-            10px
-            9px;
+            8px
+            8px;
 
           padding:
             calc(
-              76px +
+              112px +
               env(safe-area-inset-top)
             )
             12px
             calc(
-              98px +
+              155px +
               env(safe-area-inset-bottom)
             );
         }
@@ -5720,6 +6106,19 @@
             id="czRestaurantTopName"
           ></div>
         </div>
+
+        <div class="czRestaurantTopDecor">
+
+          <div class="czRestaurantTopHanger">
+            <span>FRESH</span>
+          </div>
+
+          <div class="czRestaurantTopHanger">
+            <span>FOOD</span>
+          </div>
+
+        </div>
+
 
         <div class="czRestaurantHero">
 
@@ -5938,6 +6337,124 @@
   }
 
 
+  function restaurantShimmerHTML(){
+
+    return `
+      <div class="czRestaurantShimmer">
+
+        ${Array.from({length:4}).map(
+          function(){
+            return `
+              <div class="czRestaurantShimmerCard">
+
+                <div
+                  class="czRestaurantShimmerImage"
+                ></div>
+
+                <div
+                  class="czRestaurantShimmerBody"
+                >
+                  <div
+                    class="czRestaurantShimmerLine"
+                  ></div>
+
+                  <div
+                    class="czRestaurantShimmerLine short"
+                  ></div>
+                </div>
+
+              </div>
+            `;
+          }
+        ).join("")}
+
+      </div>
+    `;
+
+  }
+
+
+  function showRestaurantShimmer(){
+
+    if(!restaurantSection){
+      return;
+    }
+
+    restaurantSection.innerHTML =
+      restaurantShimmerHTML();
+
+  }
+
+
+  function setupRestaurantViewportLazyLoad(){
+
+    if(!restaurantSection){
+      return;
+    }
+
+
+    showRestaurantShimmer();
+
+
+    if(
+      restaurantViewportObserver
+    ){
+      return;
+    }
+
+
+    restaurantViewportObserver =
+      new IntersectionObserver(
+        function(entries){
+
+          entries.forEach(
+            function(entry){
+
+              if(
+                entry.isIntersecting &&
+                !restaurantSectionSeen
+              ){
+
+                restaurantSectionSeen =
+                  true;
+
+
+                restaurantViewportObserver
+                  ?.disconnect();
+
+
+                restaurantViewportObserver =
+                  null;
+
+
+                if(
+                  isFoodModeActive()
+                ){
+
+                  checkRestaurantMode();
+
+                }
+
+              }
+
+            }
+          );
+
+        },
+        {
+          threshold:0.01,
+          rootMargin:"0px"
+        }
+      );
+
+
+    restaurantViewportObserver.observe(
+      restaurantSection
+    );
+
+  }
+
+
   /* =========================================================
      LOAD RESTAURANT DATA
   ========================================================= */
@@ -5971,6 +6488,9 @@
 
     restaurantLoading =
       true;
+
+
+    showRestaurantShimmer();
 
 
     try{
@@ -7094,6 +7614,21 @@
     inner.innerHTML = `
 
       <div
+        class="czRestaurantPopupHanger"
+      >
+        <span
+          class="czRestaurantPopupHangerHook"
+        ></span>
+
+        <div
+          class="czRestaurantPopupHangerBoard"
+        >
+          CHOOSE SIZE
+        </div>
+      </div>
+
+
+      <div
         class="czRestaurantVariantImageBox"
       >
 
@@ -7104,6 +7639,8 @@
                 class="czRestaurantVariantImage"
                 src="${escapeRestaurantHTML(group.image1)}"
                 alt="${escapeRestaurantHTML(group.product_name)}"
+                loading="lazy"
+                decoding="async"
               >
             `
             : `
@@ -7669,7 +8206,8 @@
 
 
             if(
-              isFoodModeActive()
+              isFoodModeActive() &&
+              restaurantSectionSeen
             ){
 
               loadRestaurantData();
@@ -7716,7 +8254,17 @@
                     isFoodModeActive()
                   ){
 
-                    checkRestaurantMode();
+                    if(
+                      restaurantSectionSeen
+                    ){
+
+                      checkRestaurantMode();
+
+                    }else{
+
+                      setupRestaurantViewportLazyLoad();
+
+                    }
 
                   }else{
 
@@ -8060,7 +8608,19 @@
       restaurantLoading =
         false;
 
-      await checkRestaurantMode();
+
+      if(
+        restaurantSectionSeen &&
+        isFoodModeActive()
+      ){
+
+        await checkRestaurantMode();
+
+      }else{
+
+        showRestaurantShimmer();
+
+      }
 
     };
 
