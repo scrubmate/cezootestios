@@ -23,6 +23,12 @@ let io=null;
 let modeObs=null;
 let channel=null;
 
+let specialOpeningLoader=null;
+let specialLoaderActive=false;
+let specialLoaderStartedAt=0;
+let specialShadeTimer=null;
+let specialShadeIndex=0;
+
 
 document.readyState==="loading"
 ?document.addEventListener("DOMContentLoaded",init,{once:true})
@@ -133,6 +139,8 @@ function lazyWatch(){
             !loading
           ){
 
+            showSpecialOpeningLoader();
+
             loadCakes();
 
           }
@@ -168,14 +176,35 @@ function modeWatch(){
         syncCart();
 
 
+        if(!special()){
+
+          cancelSpecialOpeningLoader();
+
+          return;
+        }
+
+
+        showSpecialOpeningLoader();
+
+
         if(
-          special() &&
           seen &&
           !loaded &&
           !loading
         ){
 
           loadCakes();
+
+          return;
+        }
+
+
+        if(loaded){
+
+          waitForVisibleCakeImages()
+            .then(
+              closeSpecialOpeningLoader
+            );
 
         }
 
@@ -1035,6 +1064,18 @@ function injectCSS(){
     }
   }
 
+
+  /* ---------- SPECIAL OPENING LOADER ---------- */
+
+  .czSpecialOpeningLoader{position:fixed;inset:0;z-index:2147483647;width:100%;height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;background:#fff;opacity:1;visibility:visible;pointer-events:auto;transition:opacity .24s ease,visibility .24s ease;box-sizing:border-box;}
+  .czSpecialOpeningLoader.hide{opacity:0;visibility:hidden;pointer-events:none;}
+  .czSpecialOpeningCenter{width:min(92vw,420px);min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .czSpecialOpeningArt{width:104px;height:88px;display:flex;align-items:center;justify-content:center;position:relative;}
+  .czSpecialOpeningCakeIcon{font-size:62px;line-height:1;color:#ff7eb8;filter:drop-shadow(0 8px 16px rgba(255,126,184,.18));animation:czSpecialCakeIcon 1.15s ease-in-out infinite;}
+  .czSpecialOpeningText{margin-top:16px;color:#262626;font-size:15px;font-weight:800;line-height:1.25;letter-spacing:-.15px;animation:czSpecialOpeningTextMove 1.25s ease-in-out infinite;}
+  @keyframes czSpecialCakeIcon{0%,100%{transform:translateY(0) scale(1) rotate(-2deg);}50%{transform:translateY(-7px) scale(1.06) rotate(2deg);}}
+  @keyframes czSpecialOpeningTextMove{0%,100%{transform:translate3d(0,0,0);opacity:.72;}50%{transform:translate3d(0,-3px,0);opacity:1;}}
+
   @media(prefers-reduced-motion:reduce){
     .czCakeOverlay,
     .czCakeSheet,
@@ -1055,10 +1096,237 @@ function injectCSS(){
     .czCakeHanger{
       animation:none;
     }
+
+    .czSpecialOpeningCakeIcon,
+    .czSpecialOpeningText{
+      animation:none;
+    }
   }
   `;
 
   document.head.appendChild(style);
+}
+
+
+
+/* =========================================================
+   SPECIAL MODE OPENING LOADER
+========================================================= */
+
+
+function stopSpecialShadeRotation(){
+
+  if(specialShadeTimer){
+    window.clearInterval(specialShadeTimer);
+    specialShadeTimer=null;
+  }
+
+}
+
+
+function applySpecialCakeShade(){}
+
+
+function startSpecialShadeRotation(){
+  stopSpecialShadeRotation();
+}
+
+
+function showSpecialOpeningLoader(){
+
+  if(!special() || specialLoaderActive){
+    return;
+  }
+
+  specialLoaderActive=true;
+  specialLoaderStartedAt=Date.now();
+
+  specialOpeningLoader=
+    document.getElementById("czSpecialOpeningLoader");
+
+  if(!specialOpeningLoader){
+
+    specialOpeningLoader=
+      document.createElement("div");
+
+    specialOpeningLoader.id=
+      "czSpecialOpeningLoader";
+
+    specialOpeningLoader.className=
+      "czSpecialOpeningLoader";
+
+    specialOpeningLoader.innerHTML=`
+      <div
+        class="czSpecialOpeningCenter"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading special cakes"
+      >
+        <div class="czSpecialOpeningArt" aria-hidden="true">
+          <i class="fa-solid fa-cake-candles czSpecialOpeningCakeIcon"></i>
+        </div>
+
+        <div class="czSpecialOpeningText">
+          Preparing special cakes for you
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(
+      specialOpeningLoader
+    );
+
+  }else{
+
+    specialOpeningLoader.classList.remove(
+      "hide"
+    );
+
+  }
+
+  startSpecialShadeRotation();
+
+}
+
+
+async function waitForVisibleCakeImages(){
+
+  if(!section){
+    return;
+  }
+
+  const images=
+    Array.from(
+      section.querySelectorAll(
+        ".czCakeImage"
+      )
+    )
+    .slice(0,4);
+
+  if(!images.length){
+    return;
+  }
+
+  await Promise.race([
+    Promise.all(
+      images.map(
+        image=>
+          new Promise(resolve=>{
+
+            if(
+              image.complete &&
+              image.naturalWidth>0
+            ){
+              resolve();
+              return;
+            }
+
+            const done=()=>{
+              image.removeEventListener("load",done);
+              image.removeEventListener("error",done);
+              resolve();
+            };
+
+            image.addEventListener(
+              "load",
+              done,
+              {once:true}
+            );
+
+            image.addEventListener(
+              "error",
+              done,
+              {once:true}
+            );
+
+          })
+      )
+    ),
+
+    new Promise(
+      resolve=>
+        window.setTimeout(
+          resolve,
+          2200
+        )
+    )
+  ]);
+
+}
+
+
+async function closeSpecialOpeningLoader(){
+
+  if(!specialLoaderActive){
+    return;
+  }
+
+  const minimumVisibleTime=650;
+
+  const elapsed=
+    Date.now()-
+    specialLoaderStartedAt;
+
+  if(elapsed<minimumVisibleTime){
+
+    await new Promise(
+      resolve=>
+        window.setTimeout(
+          resolve,
+          minimumVisibleTime-elapsed
+        )
+    );
+
+  }
+
+  stopSpecialShadeRotation();
+
+  if(!specialOpeningLoader){
+
+    specialLoaderActive=false;
+    return;
+
+  }
+
+  specialOpeningLoader.classList.add(
+    "hide"
+  );
+
+  const loaderToRemove=
+    specialOpeningLoader;
+
+  window.setTimeout(
+    ()=>{
+
+      if(loaderToRemove?.isConnected){
+        loaderToRemove.remove();
+      }
+
+    },
+    280
+  );
+
+  specialOpeningLoader=null;
+  specialLoaderActive=false;
+
+}
+
+
+function cancelSpecialOpeningLoader(){
+
+  stopSpecialShadeRotation();
+
+  if(!specialLoaderActive){
+    return;
+  }
+
+  if(specialOpeningLoader?.isConnected){
+    specialOpeningLoader.remove();
+  }
+
+  specialOpeningLoader=null;
+  specialLoaderActive=false;
+
 }
 
 
@@ -1181,6 +1449,10 @@ async function loadCakes(){
 
     updateCart();
 
+    await waitForVisibleCakeImages();
+
+    await closeSpecialOpeningLoader();
+
 
   }catch(error){
 
@@ -1195,6 +1467,8 @@ async function loadCakes(){
       <div class="czCakeState">Unable to load cakes</div>
 
     `;
+
+    await closeSpecialOpeningLoader();
 
 
   }finally{
