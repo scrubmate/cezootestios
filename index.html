@@ -13,6 +13,11 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 >
+<link
+    href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+>
+
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Inter:wght@700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -179,6 +184,1116 @@ html, body {
   transition: 0.3s;
   z-index: 10;
 }
+
+
+/* =====================================================
+   SALE SECTION - FULL BLEED / NO LEFT-RIGHT GAP
+===================================================== */
+
+/* remove the generic content-section 1px gap only for Sale */
+.content-section[data-section="Sale"]{
+    padding:0 !important;
+    margin:0 !important;
+    overflow:visible;
+}
+
+/* same full-width technique used by Fresh and other sections */
+.content-section[data-section="Sale"] .spider-offer-section{
+    position:relative;
+
+    width:100vw;
+
+    margin-left:calc(50% - 50vw);
+    margin-right:calc(50% - 50vw);
+
+    margin-top:-18px;
+
+    padding-bottom:155px;
+}
+
+/* banner touches both screen edges */
+.content-section[data-section="Sale"] .premium-banner{
+    width:100%;
+    margin-left:0;
+    margin-right:0;
+
+    /* no curved side/bottom edge: visually mixes with category area */
+    border-radius:0;
+}
+
+
+/* MOBILE */
+@media(max-width:600px){
+
+    .content-section[data-section="Sale"] .spider-offer-section{
+        width:100vw;
+
+        margin-left:calc(50% - 50vw);
+        margin-right:calc(50% - 50vw);
+
+        margin-top:-16px;
+
+        padding-bottom:135px;
+    }
+
+    .content-section[data-section="Sale"] .premium-banner{
+        width:100%;
+        border-radius:0;
+    }
+}
+
+
+/* SMALL MOBILE */
+@media(max-width:390px){
+
+    .content-section[data-section="Sale"] .spider-offer-section{
+        margin-top:-14px;
+    }
+
+    .content-section[data-section="Sale"] .premium-banner{
+        border-radius:0;
+    }
+}
+
+
+/* =====================================================
+   FULL SPIDER SALE SECTION
+===================================================== */
+
+.spider-offer-section{
+    position:relative;
+    width:100%;
+
+    /* PUSH COMPLETE SECTION UP / MIX WITH CATEGORY */
+    margin-top:-18px;
+
+    padding-bottom:155px;
+}
+
+
+/* =====================================================
+   MAIN TOP BANNER
+===================================================== */
+
+.premium-banner{
+    position:relative;
+
+    width:100%;
+    height:170px;
+
+    overflow:hidden;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #ffffff00 0%,
+            #ffffff00 78%,
+            rgb(255 255 255 / 18%) 86%,
+            rgb(255 255 255 / 55%) 94%,
+            #ffffff 100%
+        ),
+        linear-gradient(
+            120deg,
+            #cfe0f4 0%,
+            #dde5f1 35%,
+            #ffd6dc 70%,
+            #e1b5bb 100%
+        );
+
+    border-radius:0;
+}
+
+
+/* =====================================================
+   LEFT IMAGE
+===================================================== */
+
+.banner-left-image{
+    position:absolute;
+
+    left:-7px;
+    bottom:0;
+
+    width:205px;
+    height:100%;
+
+    object-fit:contain;
+    object-position:left bottom;
+
+    pointer-events:none;
+    user-select:none;
+}
+
+
+/* =====================================================
+   RIGHT IMAGE
+===================================================== */
+
+.banner-right-image{
+    position:absolute;
+
+    right:0;
+    bottom:0;
+
+    width:245px;
+    height:115%;
+
+    object-fit:contain;
+    object-position:right bottom;
+
+    pointer-events:none;
+    user-select:none;
+}
+
+
+/* =====================================================
+   CENTER TITLE
+===================================================== */
+
+.center-logo{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    pointer-events:none;
+}
+
+
+/* =====================================================
+   CEZOO
+===================================================== */
+
+.cezoo-title{
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:7px;
+
+    font-family:"Bangers",cursive;
+
+    font-size:48px;
+
+    line-height:.85;
+
+    letter-spacing:4px;
+
+    color:#e31f36;
+
+    -webkit-text-stroke:2px #111827;
+
+    paint-order:stroke fill;
+
+    text-shadow:
+        2px 3px 0 #111827,
+        4px 5px 0 rgba(0,0,0,.13);
+}
+
+
+.cezoo-title span{
+    display:inline-block;
+}
+
+
+.cezoo-title span:nth-child(1){
+    transform:
+        translateY(7px)
+        rotate(-8deg);
+}
+
+
+.cezoo-title span:nth-child(2){
+    transform:
+        translateY(2px)
+        rotate(-4deg);
+}
+
+
+.cezoo-title span:nth-child(3){
+    transform:
+        translateY(-4px)
+        scale(1.08);
+}
+
+
+.cezoo-title span:nth-child(4){
+    transform:
+        translateY(2px)
+        rotate(4deg);
+}
+
+
+.cezoo-title span:nth-child(5){
+    transform:
+        translateY(7px)
+        rotate(8deg);
+}
+
+
+/* =====================================================
+   SPIDER SALE
+===================================================== */
+
+.spider-sale{
+    margin-top:14px;
+
+    font-family:"Bangers",cursive;
+
+    font-size:23px;
+
+    line-height:1;
+
+    letter-spacing:6px;
+
+    color:#172554;
+
+    -webkit-text-stroke:.8px #0b1220;
+
+    paint-order:stroke fill;
+
+    transform:
+        rotate(-2deg)
+        skew(-4deg);
+}
+
+
+/* =====================================================
+   WEB CONNECTION AREA
+===================================================== */
+
+.offer-web-holder{
+    position:absolute;
+
+    left:50%;
+    top:170px;
+
+    transform:translateX(-50%);
+
+    width:min(92%,760px);
+    height:48px;
+
+    pointer-events:none;
+}
+
+
+/* =====================================================
+   WEB STRINGS
+===================================================== */
+
+.offer-web{
+    position:absolute;
+
+    top:0;
+
+    width:1.5px;
+    height:48px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #506078,
+            rgba(80,96,120,.38),
+            #506078
+        );
+}
+
+
+.offer-web.web-left{
+    left:15%;
+
+    transform:rotate(-3deg);
+}
+
+
+.offer-web.web-center{
+    left:50%;
+
+    height:56px;
+
+    transform:translateX(-50%);
+}
+
+
+.offer-web.web-right{
+    right:15%;
+
+    transform:rotate(3deg);
+}
+
+
+/* =====================================================
+   SMALL WEB FIBERS
+===================================================== */
+
+.offer-web::before,
+.offer-web::after{
+    content:"";
+
+    position:absolute;
+
+    width:7px;
+    height:18px;
+
+    border-radius:50%;
+}
+
+
+.offer-web::before{
+    left:-6px;
+    top:12px;
+
+    border-left:
+        1px solid rgba(70,85,110,.30);
+
+    transform:rotate(16deg);
+}
+
+
+.offer-web::after{
+    right:-6px;
+    top:28px;
+
+    border-right:
+        1px solid rgba(70,85,110,.28);
+
+    transform:rotate(-16deg);
+}
+
+
+/* =====================================================
+   ATTACHED OFFER CARD
+===================================================== */
+
+.attached-offer-card{
+    position:absolute;
+
+    left:50%;
+    top:212px;
+
+    width:min(92%,760px);
+    height:125px;
+
+    overflow:hidden;
+
+    display:flex;
+    align-items:stretch;
+
+    border-radius:18px;
+
+    background:
+        radial-gradient(
+            circle at 82% 18%,
+            rgba(255,255,255,.72),
+            transparent 30%
+        ),
+        linear-gradient(
+            120deg,
+            #f6faff 0%,
+            #e8f2ff 44%,
+            #fff0f3 72%,
+            #ffe4e9 100%
+        );
+
+    border:
+        1px solid rgba(92,120,160,.18);
+
+    box-shadow:
+        0 10px 26px rgba(65,80,120,.13),
+        inset 0 1px 0 rgba(255,255,255,.85);
+
+    /* START INSIDE TOP BANNER */
+    transform:
+        translateX(-50%)
+        translateY(-72px)
+        scale(.96);
+
+    opacity:0;
+
+    transition:
+        transform .72s cubic-bezier(.18,.89,.32,1.22),
+        opacity .30s ease;
+}
+
+
+/* =====================================================
+   CARD COMES DOWN
+===================================================== */
+
+.attached-offer-card.show-offer{
+    transform:
+        translateX(-50%)
+        translateY(0)
+        scale(1);
+
+    opacity:1;
+}
+
+
+/* =====================================================
+   SMALL LANDING BUMP
+===================================================== */
+
+.attached-offer-card.offer-bump{
+    animation:
+        offerDownBump
+        .34s
+        ease-out;
+}
+
+
+@keyframes offerDownBump{
+
+    0%{
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+
+    45%{
+        transform:
+            translateX(-50%)
+            translateY(5px)
+            scale(.99);
+    }
+
+    75%{
+        transform:
+            translateX(-50%)
+            translateY(-2px)
+            scale(1.005);
+    }
+
+    100%{
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* =====================================================
+   CARD LEFT CONTENT
+===================================================== */
+
+.offer-card-content{
+    position:relative;
+
+    width:66%;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+
+    padding:
+        16px
+        16px
+        16px
+        24px;
+}
+
+
+/* =====================================================
+   OFFER TITLE
+===================================================== */
+
+.offer-main-title{
+    max-width:420px;
+
+    color:#172554;
+
+    font-family:"Bangers",cursive;
+
+    font-size:27px;
+
+    line-height:.96;
+
+    letter-spacing:1.4px;
+
+    font-weight:400;
+}
+
+
+.offer-main-title .highlight{
+    display:block;
+
+    margin-top:3px;
+
+    color:#e31f36;
+}
+
+
+/* =====================================================
+   SMALL DESCRIPTION
+===================================================== */
+
+.offer-small-text{
+    margin-top:8px;
+
+    max-width:410px;
+
+    color:#5f6c80;
+
+    font-size:9px;
+
+    font-weight:600;
+
+    line-height:1.4;
+}
+
+
+/* =====================================================
+   MOVIE CARD AREA
+===================================================== */
+
+.offer-card-image-wrap{
+    position:relative;
+
+    width:34%;
+    height:100%;
+
+    display:flex;
+    align-items:flex-end;
+    justify-content:flex-end;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(219,235,255,.70),
+            rgba(255,225,232,.72)
+        );
+}
+
+
+/* =====================================================
+   LIGHT CIRCLE
+===================================================== */
+
+.offer-card-image-wrap::before{
+    content:"";
+
+    position:absolute;
+
+    right:-25px;
+    bottom:-45px;
+
+    width:170px;
+    height:170px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.78),
+            rgba(212,226,255,.30) 48%,
+            transparent 72%
+        );
+}
+
+
+/* =====================================================
+   MOVIE CARDS
+===================================================== */
+
+.offer-card-image{
+    position:absolute;
+
+    display:block;
+
+    object-fit:cover;
+
+    border-radius:9px;
+
+    box-shadow:
+        0 5px 12px rgba(30,45,80,.16);
+
+    pointer-events:none;
+    user-select:none;
+
+    transition:
+        transform .42s ease,
+        opacity .42s ease;
+}
+
+
+/* =====================================================
+   CARD 1
+===================================================== */
+
+.offer-card-image.card-one{
+    right:16px;
+    bottom:8px;
+
+    width:88px;
+    height:108px;
+
+    opacity:1;
+
+    transform:
+        translateX(0)
+        rotate(2deg);
+}
+
+
+/* =====================================================
+   CARD 2
+===================================================== */
+
+.offer-card-image.card-two{
+    right:74px;
+    bottom:13px;
+
+    width:76px;
+    height:94px;
+
+    opacity:.78;
+
+    transform:
+        translateX(0)
+        rotate(-7deg)
+        scale(.94);
+}
+
+
+/* =====================================================
+   CARD 3
+===================================================== */
+
+.offer-card-image.card-three{
+    right:120px;
+    bottom:16px;
+
+    width:68px;
+    height:86px;
+
+    opacity:.62;
+
+    transform:
+        rotate(7deg)
+        scale(.88);
+}
+
+
+/* =====================================================
+   ROTATION STATE 1
+===================================================== */
+
+.offer-card-image-wrap.swap-cards .card-one{
+    right:120px;
+    bottom:16px;
+
+    width:68px;
+    height:86px;
+
+    opacity:.62;
+
+    transform:
+        rotate(7deg)
+        scale(.88);
+}
+
+
+.offer-card-image-wrap.swap-cards .card-two{
+    right:16px;
+    bottom:8px;
+
+    width:88px;
+    height:108px;
+
+    opacity:1;
+
+    transform:
+        rotate(2deg)
+        scale(1);
+}
+
+
+.offer-card-image-wrap.swap-cards .card-three{
+    right:74px;
+    bottom:13px;
+
+    width:76px;
+    height:94px;
+
+    opacity:.78;
+
+    transform:
+        rotate(-7deg)
+        scale(.94);
+}
+
+
+/* =====================================================
+   ROTATION STATE 2
+===================================================== */
+
+.offer-card-image-wrap.swap-cards-two .card-one{
+    right:74px;
+    bottom:13px;
+
+    width:76px;
+    height:94px;
+
+    opacity:.78;
+
+    transform:
+        rotate(-7deg)
+        scale(.94);
+}
+
+
+.offer-card-image-wrap.swap-cards-two .card-two{
+    right:120px;
+    bottom:16px;
+
+    width:68px;
+    height:86px;
+
+    opacity:.62;
+
+    transform:
+        rotate(7deg)
+        scale(.88);
+}
+
+
+.offer-card-image-wrap.swap-cards-two .card-three{
+    right:16px;
+    bottom:8px;
+
+    width:88px;
+    height:108px;
+
+    opacity:1;
+
+    transform:
+        rotate(2deg)
+        scale(1);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:600px){
+
+    .spider-offer-section{
+        margin-top:-16px;
+
+        padding-bottom:135px;
+    }
+
+
+    .premium-banner{
+        height:145px;
+
+        margin-top:16px;
+
+        border-radius:0;
+    }
+
+
+    .banner-left-image{
+        left:-5px;
+
+        width:128px;
+        height:94%;
+    }
+
+
+    .banner-right-image{
+        width:158px;
+        height:110%;
+    }
+
+
+    .cezoo-title{
+        font-size:32px;
+
+        gap:4px;
+
+        letter-spacing:2px;
+
+        -webkit-text-stroke:
+            1.3px #111827;
+    }
+
+
+    .spider-sale{
+        margin-top:10px;
+
+        font-size:16px;
+
+        letter-spacing:4px;
+    }
+
+
+    .offer-web-holder{
+        top:145px;
+
+        width:94%;
+        height:38px;
+    }
+
+
+    .offer-web{
+        height:38px;
+    }
+
+
+    .offer-web.web-center{
+        height:44px;
+    }
+
+
+    .attached-offer-card{
+        top:178px;
+
+        width:94%;
+        height:112px;
+
+        border-radius:14px;
+
+        transform:
+            translateX(-50%)
+            translateY(-54px)
+            scale(.96);
+    }
+
+
+    .attached-offer-card.show-offer{
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+
+
+    .offer-card-content{
+        width:67%;
+
+        padding:
+            12px
+            5px
+            12px
+            14px;
+    }
+
+
+    .offer-main-title{
+        max-width:230px;
+
+        font-size:19px;
+
+        line-height:.98;
+
+        letter-spacing:.7px;
+    }
+
+
+    .offer-small-text{
+        max-width:210px;
+
+        margin-top:6px;
+
+        font-size:6.8px;
+
+        line-height:1.35;
+    }
+
+
+    .offer-card-image-wrap{
+        width:33%;
+    }
+
+
+    .offer-card-image.card-one{
+        right:8px;
+        bottom:7px;
+
+        width:68px;
+        height:88px;
+    }
+
+
+    .offer-card-image.card-two{
+        right:47px;
+        bottom:11px;
+
+        width:58px;
+        height:76px;
+    }
+
+
+    .offer-card-image.card-three{
+        right:80px;
+        bottom:14px;
+
+        width:51px;
+        height:68px;
+
+        opacity:.62;
+    }
+
+
+    /* MOBILE ROTATION 1 */
+
+    .offer-card-image-wrap.swap-cards .card-one{
+        right:80px;
+        bottom:14px;
+
+        width:51px;
+        height:68px;
+    }
+
+
+    .offer-card-image-wrap.swap-cards .card-two{
+        right:8px;
+        bottom:7px;
+
+        width:68px;
+        height:88px;
+    }
+
+
+    .offer-card-image-wrap.swap-cards .card-three{
+        right:47px;
+        bottom:11px;
+
+        width:58px;
+        height:76px;
+    }
+
+
+    /* MOBILE ROTATION 2 */
+
+    .offer-card-image-wrap.swap-cards-two .card-one{
+        right:47px;
+        bottom:11px;
+
+        width:58px;
+        height:76px;
+    }
+
+
+    .offer-card-image-wrap.swap-cards-two .card-two{
+        right:80px;
+        bottom:14px;
+
+        width:51px;
+        height:68px;
+    }
+
+
+    .offer-card-image-wrap.swap-cards-two .card-three{
+        right:8px;
+        bottom:7px;
+
+        width:68px;
+        height:88px;
+    }
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media(max-width:390px){
+
+    .spider-offer-section{
+        margin-top:-14px;
+    }
+
+
+    .premium-banner{
+        height:135px;
+
+        margin-top:0;
+
+        border-radius:0;
+    }
+
+
+    .banner-left-image{
+        width:110px;
+    }
+
+
+    .banner-right-image{
+        width:145px;
+    }
+
+
+    .cezoo-title{
+        font-size:28px;
+
+        gap:3px;
+
+        letter-spacing:1px;
+    }
+
+
+    .spider-sale{
+        font-size:14px;
+
+        letter-spacing:3px;
+    }
+
+
+    .offer-web-holder{
+        top:135px;
+    }
+
+
+    .attached-offer-card{
+        top:168px;
+
+        height:108px;
+
+        transform:
+            translateX(-50%)
+            translateY(-48px)
+            scale(.96);
+    }
+
+
+    .attached-offer-card.show-offer{
+        transform:
+            translateX(-50%)
+            translateY(0)
+            scale(1);
+    }
+
+
+    .offer-main-title{
+        font-size:17px;
+    }
+
+
+    .offer-small-text{
+        font-size:6.3px;
+    }
+}
+
 
 /* show overlay when sheet open */
 .overlay.active {
@@ -7674,6 +8789,23 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
     onerror="this.onerror=null;this.src=this.dataset.img;"
 >    <span>All</span>
 </div>
+<div
+    class="cat-item"
+    id="sale-category"
+    data-color="linear-gradient(120deg, #b9d9ff 0%, #d7e8ff 35%, #ffd6dc 70%, #ffbdc7 100%)"
+>
+    <div class="catPinkShimmer"></div>
+
+    <img
+        class="catLazy"
+        id="cat-sale"
+        src="cezoo-local://LocalAssets/cezoo/sale.png"
+        data-img="sale/sale.png"
+        onerror="this.onerror=null;this.src=this.dataset.img;"
+    >
+
+    <span>Sale</span>
+</div>
 
 <div class="cat-item" data-color="#f6e08d">
     <div class="catPinkShimmer"></div>
@@ -8359,6 +9491,20 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 </div>
 
 
+<h3 class="sectionTitle">Today'S Special</h3>
+
+<div class="autoProductRow"
+     data-table="cezoogroceries"
+     data-ids="747,748,749,750,751,752,753,754,755,756,757,758,759">
+</div>
+
+
+<div class="seeAllBar" id="seeAllBar201">
+  <span>See All</span>
+  <span class="seeAllArrow">›</span>
+</div>
+
+
 
 
 
@@ -8910,6 +10056,154 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 
 
 
+<div class="content-section" data-section="Sale">
+
+  <section
+    class="spider-offer-section"
+    id="spiderOfferSection"
+>
+
+
+    <!-- MAIN SPIDER SALE BANNER -->
+
+    <div class="premium-banner">
+
+
+        <img
+            src="sale/2.png"
+            class="banner-left-image"
+            alt=""
+        >
+
+
+        <div class="center-logo">
+
+
+            <div class="cezoo-title">
+
+                <span>C</span>
+                <span>E</span>
+                <span>Z</span>
+                <span>O</span>
+                <span>O</span>
+
+            </div>
+
+
+            <div class="spider-sale">
+                SPIDER SALE
+            </div>
+</div>
+
+
+        <img
+            src="sale/sp3.png"
+            class="banner-right-image"
+            alt=""
+        >
+
+
+    </div>
+
+
+
+    <!-- WEB THREADS -->
+
+    <div class="offer-web-holder">
+
+        <div class="offer-web web-left"></div>
+
+        <div class="offer-web web-center"></div>
+
+        <div class="offer-web web-right"></div>
+
+    </div>
+
+
+
+    <!-- ATTACHED OFFER CARD -->
+
+    <div
+        class="attached-offer-card"
+        id="attachedOfferCard"
+    >
+
+
+        <!-- LEFT TEXT -->
+
+        <div class="offer-card-content">
+
+
+            <div class="offer-main-title">
+
+                SHOP ABOVE ₹800
+
+                <span class="highlight">
+                    ON 4 DIFFERENT ORDERS
+                </span>
+
+                GET MOVIE TICKETS FREE
+
+            </div>
+
+
+            <div class="offer-small-text">
+
+                Complete four separate qualifying orders above ₹800 each
+                to unlock your movie ticket reward.
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- RIGHT IMAGE -->
+
+        <div class="offer-card-image-wrap" id="movieCardStack">
+
+            <img
+                src="sale/movie3.jpeg"
+                class="offer-card-image card-one"
+                alt=""
+            >
+
+            <img
+                src="sale/dd.jpg"
+                class="offer-card-image card-two"
+                alt=""
+            >
+
+            <img
+                src="sale/movi3.jpg"
+                class="offer-card-image card-three"
+                alt=""
+            >
+
+        </div>
+
+
+    </div>
+
+
+</section>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
   <div class="content-section" data-section="Fresh">
     <div id="freshSection">
   <div class="freshBanner">
@@ -8984,12 +10278,12 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
     <div class="LaunchShimmer"></div>
     <img
       class="LaunchLazy"
-      src="cezoo-local://LocalAssets/cezoo/magoes.png"
-      data-img="fresh/magoes.png"
+      src=""
+      data-img="dd.webp"
       alt=""
       onerror="this.onerror=null;this.src=this.dataset.img;"
     >
-    <span>Mangoes</span>
+    <span>Dairy</span>
   </div>
 
   <div class="launchCard" onclick="loadLaunchProducts('eggs', this)">
@@ -9053,7 +10347,7 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 
 <div class="autoProductRow"
      data-table="fresh_products"
-     data-ids="34,35,36,37,38,39,40,41,42">
+     data-ids="34,35,36,37,38,39,40,41,42,47">
 </div>
 
 <div class="seeAllBar" id="seeAllBar91">
@@ -9074,17 +10368,7 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 >
 
 </div>
-<h3 class="sectionTitle">Farm Picks</h3>
 
-
-  <div class="autoProductRow"
-     data-table="fresh_products"
-     data-ids="47,48,50,51,52,53">
-</div>
-<div class="seeAllBar" id="seeAllBar25">
-  <span>See All</span>
-  <span class="seeAllArrow">›</span>
-</div>
 
 
 
@@ -9117,12 +10401,12 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
     </div>
 
     <div class="villageCard" id="villageFreshVeggies">
-      <h3 class="villageTitle">Fresh<br>Veggies</h3>
+      <h3 class="villageTitle">Fresh<br>Dairy</h3>
       <div class="villageImageBox">
         <div class="villageShimmer"></div>
 <img
     id="Begusarai"
-    data-src="fresh/ok5.png"
+    data-src="dd.webp"
     class="villageImg"
     alt="Fresh Veggies"
 >      </div>
@@ -9181,17 +10465,7 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 
   </div>
 </section>
-<h3 class="sectionTitle">Fresh Picks</h3>
 
-
-  <div class="autoProductRow"
-     data-table="fresh_products"
-     data-ids="2,3,4,5,6,7,9,10">
-</div>
-<div class="seeAllBar" id="seeAllBar21">
-  <span>See All</span>
-  <span class="seeAllArrow">›</span>
-</div>
 
 
 
@@ -9202,7 +10476,7 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 
   <div class="autoProductRow"
      data-table="fresh_products"
-     data-ids="8,11,12,13,14,15,16,17,18">
+     data-ids="2,3,4,5,6,7,9,10,8,11,12,13,14,15,16,17,18">
 </div>
 <div class="seeAllBar" id="seeAllBar22">
   <span>See All</span>
@@ -14014,7 +15288,7 @@ body[data-cezoo-mode="special"] .cezooModeBtn:not([data-mode="special"])::after{
 
 <script src="delete.js"></script>
 
-<script src="cart.js"></script>
+<script src="cart.js?v=1"></script>
 <script src="ios.js"></script>
 <script src="location.js?v=2"></script>
 
@@ -15313,7 +16587,7 @@ freshObserver.observe(
 
 const LAUNCH_PRODUCT_IDS = {
   fruits: [10,11,12,13,14,15,16,17,18],
-  mangoes: [19,20,21,22,23,24,25,26,27],
+  mangoes: [19,20,21,22,23,24,25,26,27,29,29],
   eggs: [78,79,80],
   exotics: [37,38,39,40,41,42,43,44,45],
   veggies: [46,47,48,49,50,51,52,53,54],
@@ -16527,13 +17801,9 @@ Vaishali: {
   seeAllBar20: {
     banner: "banner/lays.jpeg",
     table: "cezoogroceries",
-    ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+    ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
   },
- seeAllBar21: {
-    banner: "13.webp",
-    table: "fresh_products",
-    ids: [2,3,4,5,6,7,9,10,11,12,13,14]
-  },
+ 
   seeAllBar22: {
     banner: "13.webp",
     table: "fresh_products",
@@ -16614,11 +17884,7 @@ mallipudiLips: {
     ids: [369,370,371,372,135,136,137,138,139,140,141,142,143,144
     ]
   },
-   seeAllBar25: {
-    banner: "13.webp",
-    table: "fresh_products",
-    ids: [47,48,49,50,51,52]
-  },
+   
    seeAllBar26: {
     banner: "13.webp",
     table: "fresh_products",
@@ -17035,6 +18301,14 @@ seeAllBar106: {
 715,716,717,718,719,720,721,722,723,724,725,726,727,728,729,730
 ]  },
 
+seeAllBar201: {
+    banner: "banner/color.jpeg",
+    table: "cezoogroceries",
+    ids: [ 
+747,748,749,750,751,752,753,754,755,756,757,758,759,760,761,762,763,764,765
+]  },
+
+
 seeAllBar27: {
     banner: "banner/color.jpeg",
     table: "cezoogroceries",
@@ -17417,7 +18691,7 @@ const categoryPopupConfigs = {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -17536,7 +18810,7 @@ const categoryPopupConfigs = {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -17652,7 +18926,7 @@ dailyuse: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -17774,7 +19048,7 @@ dailyuse: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -17883,7 +19157,7 @@ atta: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -17989,7 +19263,7 @@ drinks: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -18060,8 +19334,7 @@ snacks: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166,167,168,169]
-      },
+ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]      },
       {
         name: "Vegetables",
         image: "fresh/magoes.png",
@@ -18224,7 +19497,7 @@ instant: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -18333,7 +19606,7 @@ Stationary: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -18445,7 +19718,7 @@ Masalas: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 
 
@@ -18551,7 +19824,7 @@ Soaps: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -18657,7 +19930,7 @@ BabyCare: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -18761,7 +20034,7 @@ PoojaItems: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -18871,7 +20144,7 @@ oils: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -18976,7 +20249,7 @@ Skincare: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -19089,7 +20362,7 @@ gifts: {
         name: "Snacks",
         image: "catrgeis/sanacks.png",
         table: "cezoogroceries",
-        ids: [155,156,157,158,159,160,161,162,163,164,165,166]
+        ids: [796,797,798,799,800,802,803,804,805,806,809,815,816,818]
       },
 {
         name: "Masalas",
@@ -19156,10 +20429,12 @@ function openCategory(key){
   const config = categoryPopupConfigs[key];
   if(!config) return;
 
+  window.currentCategoryPopupConfig = config;
+
   document.getElementById("catPopupTitle").innerText = config.title;
   document.getElementById("categoryProductsPopup").classList.add("open");
   document.body.style.overflow = "hidden";
-document.querySelector(".floatBarWrap").classList.add("popupMode");
+  document.querySelector(".floatBarWrap")?.classList.add("popupMode");
   renderCategoryLeftMenu(config);
   loadCategoryRightProducts(config.categories[0], 0);
 }
@@ -19174,7 +20449,7 @@ function renderCategoryLeftMenu(config){
   const left = document.getElementById("catPopupLeft");
 
   left.innerHTML = config.categories.map((cat, index) => `
-    <div class="catPopupLeftItem ${index === 0 ? "active" : ""}" onclick="loadCategoryRightProducts(categoryPopupConfigs.fresh.categories[${index}], ${index})">
+    <div class="catPopupLeftItem ${index === 0 ? "active" : ""}" onclick="loadCategoryRightProducts(window.currentCategoryPopupConfig.categories[${index}], ${index})">
       <img src="${cat.image}" alt="">
       <span>${cat.name}</span>
     </div>
@@ -19229,10 +20504,10 @@ function renderCategoryPopupProducts(products, table){
   right.innerHTML = products.map(p => `
     <div class="productCard" data-id="${p.id}" data-table="${table}">
 
-      <div class="productImageWrap" onclick='openProductPopup(Object.assign(${JSON.stringify(p)}, {table:"${table}"}))'>
+      <div class="productImageWrap">
         <img class="productImage ProductScrollLazy" data-img="${p.image1 || ""}" decoding="async">
 
-        <button class="addBtn">
+        <button class="addBtn" type="button">
           <span>+</span>
         </button>
       </div>
@@ -19249,6 +20524,23 @@ function renderCategoryPopupProducts(products, table){
 
     </div>
   `).join("");
+
+  right.querySelectorAll(".productCard").forEach((card, index) => {
+    const product = products[index];
+    const imageWrap = card.querySelector(".productImageWrap");
+    const addBtn = card.querySelector(".addBtn");
+
+    if(imageWrap){
+      imageWrap.onclick = (e) => {
+        if(e.target.closest(".addBtn")) return;
+        openProductPopup({...product, table});
+      };
+    }
+
+    if(addBtn){
+      addBtn.onclick = (e) => addToCart(e, addBtn, product);
+    }
+  });
 
   restoreCartButtons(right);
 }
@@ -19861,6 +21153,106 @@ setInterval(() => {
     });
   }
 })();
+
+const spiderSection =
+    document.getElementById("spiderOfferSection");
+
+const attachedCard =
+    document.getElementById("attachedOfferCard");
+
+let cardShown = false;
+
+
+/* RUN ONLY ONCE */
+
+const observer =
+    new IntersectionObserver(
+
+        (entries)=>{
+
+            entries.forEach((entry)=>{
+
+                if(
+                    entry.isIntersecting &&
+                    !cardShown
+                ){
+
+                    cardShown = true;
+
+
+                    /* COME FROM TOP BANNER DOWN */
+
+                    attachedCard.classList.add(
+                        "show-offer"
+                    );
+
+
+                    /* SMALL BUMP AT TOP */
+
+                    setTimeout(()=>{
+
+                        attachedCard.classList.add(
+                            "offer-bump"
+                        );
+
+                    },720);
+
+
+                    observer.disconnect();
+
+                }
+
+            });
+
+        },
+
+        {
+            threshold:.25
+        }
+
+    );
+
+
+
+
+/* TWO MOVIE CARDS - CHANGE FRONT/BACK */
+
+const movieCardStack =
+    document.getElementById("movieCardStack");
+
+if(movieCardStack){
+
+    let movieCardState = 0;
+
+    setInterval(()=>{
+
+        movieCardState =
+            (movieCardState + 1) % 3;
+
+        movieCardStack.classList.remove(
+            "swap-cards",
+            "swap-cards-two"
+        );
+
+        if(movieCardState === 1){
+            movieCardStack.classList.add(
+                "swap-cards"
+            );
+        }
+
+        if(movieCardState === 2){
+            movieCardStack.classList.add(
+                "swap-cards-two"
+            );
+        }
+
+    },3000);
+
+}
+
+
+observer.observe(spiderSection);
+
 </script>
 
 </body>
